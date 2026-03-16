@@ -1,0 +1,3885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Integration | M&A Leadership Simulator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0a0a0b;
+      --bg-secondary: #111113;
+      --bg-card: #18181b;
+      --bg-card-hover: #1f1f23;
+      --text-primary: #fafafa;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      --accent-red: #ef4444;
+      --accent-amber: #f59e0b;
+      --accent-emerald: #10b981;
+      --accent-blue: #3b82f6;
+      --accent-purple: #8b5cf6;
+      --border-subtle: #27272a;
+      --border-medium: #3f3f46;
+      
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body: 'IBM Plex Sans', -apple-system, sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+      
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Grain overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      opacity: 0.03;
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* Typography */
+    h1, h2, h3 {
+      font-family: var(--font-display);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+
+    /* ==================== INTRO SCREEN ==================== */
+    #intro-screen {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 2rem;
+      position: relative;
+    }
+
+    .intro-badge {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--accent-amber);
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeInUp 0.8s var(--ease-out-expo) forwards;
+    }
+
+    .intro-title {
+      font-size: clamp(3rem, 10vw, 7rem);
+      font-weight: 900;
+      line-height: 0.95;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeInUp 0.8s var(--ease-out-expo) 0.1s forwards;
+    }
+
+    .intro-title span {
+      display: block;
+      font-style: italic;
+      color: var(--accent-red);
+    }
+
+    .intro-subtitle {
+      font-size: 1.25rem;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin-bottom: 3rem;
+      opacity: 0;
+      animation: fadeInUp 0.8s var(--ease-out-expo) 0.2s forwards;
+    }
+
+    .intro-stats {
+      display: flex;
+      gap: 3rem;
+      margin-bottom: 4rem;
+      opacity: 0;
+      animation: fadeInUp 0.8s var(--ease-out-expo) 0.3s forwards;
+    }
+
+    .intro-stat {
+      text-align: center;
+    }
+
+    .intro-stat-value {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--accent-red);
+    }
+
+    .intro-stat-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .intro-stat-source {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      margin-top: 0.5rem;
+      opacity: 0.7;
+    }
+
+    .intro-stat {
+      cursor: help;
+    }
+
+    .role-selection {
+      opacity: 0;
+      animation: fadeInUp 0.8s var(--ease-out-expo) 0.4s forwards;
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .role-selection h3 {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      margin-bottom: 1.5rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      font-weight: 400;
+    }
+
+    .role-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem;
+    }
+
+    .role-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      padding: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s var(--ease-out-expo);
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .role-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--accent-amber);
+      transform: scaleY(0);
+      transition: transform 0.3s var(--ease-out-expo);
+    }
+
+    .role-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-medium);
+      transform: translateY(-2px);
+    }
+
+    .role-card:hover::before {
+      transform: scaleY(1);
+    }
+
+    .role-card-title {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .role-card-desc {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .role-card-tag {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: 0.25rem 0.75rem;
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--accent-amber);
+      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ==================== GAME SCREEN ==================== */
+    #game-screen {
+      display: none;
+      min-height: 100vh;
+    }
+
+    .game-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--border-subtle);
+      background: var(--bg-secondary);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .game-logo {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .game-logo span {
+      color: var(--accent-red);
+      font-style: italic;
+    }
+
+    .game-phase {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .phase-indicator {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .phase-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--border-medium);
+      transition: all 0.3s ease;
+    }
+
+    .phase-dot.active {
+      background: var(--accent-amber);
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+    }
+
+    .phase-dot.complete {
+      background: var(--accent-emerald);
+    }
+
+    .phase-label {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .game-day {
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      background: var(--bg-card);
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--border-subtle);
+    }
+
+    /* Main game layout */
+    .game-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr 300px;
+      min-height: calc(100vh - 70px);
+    }
+
+    /* Left sidebar - Metrics */
+    .metrics-panel {
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border-subtle);
+      padding: 1.5rem;
+      overflow-y: auto;
+    }
+
+    .metrics-title {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: 1.5rem;
+    }
+
+    .metric-group {
+      margin-bottom: 2rem;
+    }
+
+    .metric-group-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .metric {
+      margin-bottom: 1rem;
+    }
+
+    .metric-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.25rem;
+    }
+
+    .metric-name {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .metric-value {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .metric-value.good { color: var(--accent-emerald); }
+    .metric-value.warning { color: var(--accent-amber); }
+    .metric-value.danger { color: var(--accent-red); }
+
+    .metric-bar {
+      height: 4px;
+      background: var(--border-subtle);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .metric-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.5s var(--ease-out-expo), background-color 0.3s ease;
+    }
+
+    .metric-bar-fill.good { background: var(--accent-emerald); }
+    .metric-bar-fill.warning { background: var(--accent-amber); }
+    .metric-bar-fill.danger { background: var(--accent-red); }
+
+    /* Center - Main content area */
+    .main-content {
+      padding: 2rem;
+      overflow-y: auto;
+    }
+
+    .scene-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .scene-header {
+      margin-bottom: 2rem;
+    }
+
+    .scene-phase-tag {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--accent-amber);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: 0.5rem;
+    }
+
+    .scene-title {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .scene-narrative {
+      color: var(--text-secondary);
+      font-size: 1.05rem;
+      line-height: 1.8;
+      margin-bottom: 2rem;
+      padding: 1.5rem;
+      background: var(--bg-card);
+      border-left: 3px solid var(--accent-amber);
+    }
+
+    /* Event popup */
+    .event-popup {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05));
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      animation: slideIn 0.4s var(--ease-out-expo);
+    }
+
+    .event-popup.positive {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+
+    .event-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--accent-red);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: 0.5rem;
+    }
+
+    .event-popup.positive .event-label {
+      color: var(--accent-emerald);
+    }
+
+    .event-text {
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    /* Card hand */
+    .card-section {
+      margin-top: 2rem;
+    }
+
+    .card-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .card-section-title {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .cards-remaining {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .card-hand {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+
+    .decision-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      padding: 1.25rem;
+      cursor: pointer;
+      transition: all 0.3s var(--ease-out-expo);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .decision-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: var(--accent-blue);
+      transform: scaleX(0);
+      transition: transform 0.3s var(--ease-out-expo);
+    }
+
+    .decision-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--accent-blue);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .decision-card:hover::after {
+      transform: scaleX(1);
+    }
+
+    .decision-card.selected {
+      border-color: var(--accent-amber);
+      background: rgba(245, 158, 11, 0.05);
+    }
+
+    .decision-card.selected::after {
+      background: var(--accent-amber);
+      transform: scaleX(1);
+    }
+
+    .card-type {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--accent-blue);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: 0.5rem;
+    }
+
+    .card-title {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      margin-bottom: 0.75rem;
+      line-height: 1.3;
+    }
+
+    .card-description {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin-bottom: 1rem;
+    }
+
+    .card-effects {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .card-effect {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 2px;
+    }
+
+    .card-effect.positive {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--accent-emerald);
+    }
+
+    .card-effect.negative {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--accent-red);
+    }
+
+    .card-effect.neutral {
+      background: rgba(161, 161, 170, 0.15);
+      color: var(--text-secondary);
+    }
+
+    /* Play button */
+    .play-card-btn {
+      display: block;
+      width: 100%;
+      max-width: 300px;
+      margin: 2rem auto 0;
+      padding: 1rem 2rem;
+      background: var(--accent-amber);
+      color: var(--bg-primary);
+      border: none;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: all 0.3s var(--ease-out-expo);
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    .play-card-btn.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .play-card-btn.active:hover {
+      background: #fbbf24;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(245, 158, 11, 0.3);
+    }
+
+    /* Right sidebar - Intel */
+    .intel-panel {
+      background: var(--bg-secondary);
+      border-left: 1px solid var(--border-subtle);
+      padding: 1.5rem;
+      overflow-y: auto;
+    }
+
+    .intel-title {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: 1.5rem;
+    }
+
+    .intel-item {
+      padding: 1rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      margin-bottom: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .intel-item.alert {
+      border-color: var(--accent-red);
+      background: rgba(239, 68, 68, 0.05);
+    }
+
+    .intel-item.warning {
+      border-color: var(--accent-amber);
+      background: rgba(245, 158, 11, 0.05);
+    }
+
+    .intel-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 0.5rem;
+    }
+
+    .intel-item-type {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+    }
+
+    .intel-item.alert .intel-item-type { color: var(--accent-red); }
+    .intel-item.warning .intel-item-type { color: var(--accent-amber); }
+
+    .intel-item-day {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--text-muted);
+    }
+
+    .intel-item-text {
+      font-size: 0.8rem;
+      line-height: 1.5;
+      color: var(--text-secondary);
+    }
+
+    .flight-risks {
+      margin-top: 2rem;
+    }
+
+    .flight-risk-person {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      margin-bottom: 0.5rem;
+    }
+
+    .flight-risk-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--border-medium);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+    }
+
+    .flight-risk-info {
+      flex: 1;
+    }
+
+    .flight-risk-name {
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .flight-risk-role {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .flight-risk-level {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      padding: 0.2rem 0.5rem;
+    }
+
+    .flight-risk-level.high {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--accent-red);
+    }
+
+    .flight-risk-level.medium {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--accent-amber);
+    }
+
+    /* ==================== RESULT SCREEN ==================== */
+    #result-screen {
+      display: none;
+      min-height: 100vh;
+      padding: 4rem 2rem;
+    }
+
+    .result-container {
+      max-width: 900px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .result-badge {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      margin-bottom: 1rem;
+    }
+
+    .result-badge.success { color: var(--accent-emerald); }
+    .result-badge.partial { color: var(--accent-amber); }
+    .result-badge.failure { color: var(--accent-red); }
+
+    .result-title {
+      font-size: clamp(2rem, 6vw, 4rem);
+      margin-bottom: 2rem;
+    }
+
+    .result-narrative {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      line-height: 1.8;
+      max-width: 700px;
+      margin: 0 auto 3rem;
+    }
+
+    .result-metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+
+    .result-metric {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      padding: 1.5rem;
+    }
+
+    .result-metric-value {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .result-metric-value.good { color: var(--accent-emerald); }
+    .result-metric-value.warning { color: var(--accent-amber); }
+    .result-metric-value.bad { color: var(--accent-red); }
+
+    .result-metric-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .result-metric-explanation {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 0.75rem;
+      line-height: 1.4;
+      font-style: italic;
+    }
+
+    .result-outcome {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      padding: 2rem;
+      margin-bottom: 3rem;
+      text-align: left;
+    }
+
+    .result-outcome h3 {
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    .result-outcome p {
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    .play-again-btn {
+      padding: 1rem 3rem;
+      background: transparent;
+      border: 2px solid var(--text-primary);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: all 0.3s var(--ease-out-expo);
+    }
+
+    .play-again-btn:hover {
+      background: var(--text-primary);
+      color: var(--bg-primary);
+    }
+
+    /* Dimension breakdown */
+    .result-dimensions {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      text-align: left;
+    }
+
+    .dimension-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .dimension-item {
+      display: grid;
+      grid-template-columns: 180px 1fr 50px;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .dimension-label {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .dimension-bar {
+      height: 8px;
+      background: var(--border-subtle);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .dimension-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.5s var(--ease-out-expo);
+    }
+
+    .dimension-bar-fill.good { background: var(--accent-emerald); }
+    .dimension-bar-fill.warning { background: var(--accent-amber); }
+    .dimension-bar-fill.bad { background: var(--accent-red); }
+
+    .dimension-grade {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .dimension-grade.good { color: var(--accent-emerald); }
+    .dimension-grade.warning { color: var(--accent-amber); }
+    .dimension-grade.bad { color: var(--accent-red); }
+
+    /* Scenario info */
+    .result-scenario {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .scenario-tag {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: 0.75rem;
+    }
+
+    .scenario-details {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .scenario-details strong {
+      color: var(--text-primary);
+    }
+
+    /* Checklist download button */
+    .download-checklist-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem 2rem;
+      background: var(--accent-emerald);
+      color: var(--bg-primary);
+      border: none;
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: all 0.3s var(--ease-out-expo);
+      margin-right: 1rem;
+    }
+
+    .download-checklist-btn:hover {
+      background: #34d399;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+    }
+
+    .result-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .dimension-item {
+        grid-template-columns: 1fr;
+        gap: 0.25rem;
+      }
+
+      .dimension-bar {
+        order: 2;
+      }
+
+      .dimension-grade {
+        order: 1;
+        text-align: left;
+      }
+
+      .scenario-details {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+    }
+      .game-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .metrics-panel,
+      .intel-panel {
+        display: none;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .intro-stats {
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+
+      .role-cards {
+        grid-template-columns: 1fr;
+      }
+
+      .game-header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== INTRO SCREEN ==================== -->
+  <div id="intro-screen">
+    <div class="intro-badge">A Leadership Simulation</div>
+    <h1 class="intro-title">
+      The<br>
+      <span>Integration</span>
+    </h1>
+    <p class="intro-subtitle">
+      Navigate the human side of a merger. The spreadsheet says this deal creates value. 
+      Your job is to make sure the people don't destroy it.
+    </p>
+    
+    <div class="intro-stats">
+      <div class="intro-stat" title="Source: KPMG, McKinsey, Lev & Gu analysis of 40,000+ deals">
+        <div class="intro-stat-value">70-90%</div>
+        <div class="intro-stat-label">M&A Failure Rate</div>
+        <div class="intro-stat-source">KPMG / McKinsey</div>
+      </div>
+      <div class="intro-stat" title="Source: EY M&A Integration Survey">
+        <div class="intro-stat-value">47%</div>
+        <div class="intro-stat-label">Key Talent Gone in Year 1</div>
+        <div class="intro-stat-source">EY Research</div>
+      </div>
+      <div class="intro-stat" title="Source: McKinsey & Company">
+        <div class="intro-stat-value">50%</div>
+        <div class="intro-stat-label">Failures from Poor Communication</div>
+        <div class="intro-stat-source">McKinsey</div>
+      </div>
+    </div>
+
+    <div class="playbook-promo" style="
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--accent-emerald);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 2.5rem;
+      opacity: 0;
+      animation: fadeInUp 0.8s var(--ease-out-expo) 0.35s forwards;
+    ">
+      ✓ Free Playbook Download After Each Playthrough
+    </div>
+
+    <div class="role-selection">
+      <h3>Select Your Role</h3>
+      <div class="role-cards">
+        <div class="role-card" data-role="acquirer">
+          <div class="role-card-title">Acquirer's CPO</div>
+          <div class="role-card-desc">
+            Eight years at Nexus Corp. You know every executive's blind spots, every cultural landmine. 
+            The target company's people are a mystery.
+          </div>
+          <div class="role-card-tag">Difficulty: Standard</div>
+        </div>
+        <div class="role-card" data-role="outsider">
+          <div class="role-card-title">Newly Hired CPO</div>
+          <div class="role-card-desc">
+            Brought in specifically for this deal. Fresh eyes, no baggage—but no political capital either. 
+            Both sides are watching to see whose ally you become.
+          </div>
+          <div class="role-card-tag">Difficulty: Hard</div>
+        </div>
+        <div class="role-card" data-role="target">
+          <div class="role-card-title">Target's CHRO</div>
+          <div class="role-card-desc">
+            You led HR at Meridian before the acquisition. Now you're "leading integration." 
+            Your people look to you. The acquirer's execs don't fully trust you yet.
+          </div>
+          <div class="role-card-tag">Difficulty: Expert</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="intro-footer" style="
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border-subtle);
+      opacity: 0;
+      animation: fadeInUp 0.8s var(--ease-out-expo) 0.5s forwards;
+    ">
+      <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem;">Built by</div>
+      <div style="font-family: var(--font-display); font-size: 1.1rem; color: var(--text-primary);">Samir Saad</div>
+      <div style="font-size: 0.8rem; color: var(--text-secondary);">HR Business Partner | SPHR</div>
+      <div style="margin-top: 1rem;">
+        <a href="https://www.linkedin.com/in/saadsamir/" target="_blank" rel="noopener" style="
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-size: 0.75rem;
+          color: var(--accent-blue);
+          text-decoration: none;
+          font-family: var(--font-mono);
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+        ">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+          </svg>
+          Connect on LinkedIn
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== GAME SCREEN ==================== -->
+  <div id="game-screen">
+    <header class="game-header">
+      <div class="game-logo">The <span>Integration</span></div>
+      <div class="game-phase">
+        <div class="phase-indicator">
+          <div class="phase-dot active" data-phase="0"></div>
+          <div class="phase-dot" data-phase="1"></div>
+          <div class="phase-dot" data-phase="2"></div>
+          <div class="phase-dot" data-phase="3"></div>
+        </div>
+        <div class="phase-label" id="phase-label">Pre-Announcement</div>
+      </div>
+      <div class="game-day" id="game-day">Day -7</div>
+    </header>
+
+    <div class="game-layout">
+      <!-- Left Sidebar: Metrics -->
+      <aside class="metrics-panel">
+        <div class="metrics-title">Integration Health</div>
+        
+        <div class="metric-group">
+          <div class="metric-group-label">Trust Scores</div>
+          
+          <div class="metric">
+            <div class="metric-header">
+              <span class="metric-name">Acquirer Employees</span>
+              <span class="metric-value" id="trust-acquirer">65%</span>
+            </div>
+            <div class="metric-bar">
+              <div class="metric-bar-fill" id="trust-acquirer-bar" style="width: 65%"></div>
+            </div>
+          </div>
+          
+          <div class="metric">
+            <div class="metric-header">
+              <span class="metric-name">Target Employees</span>
+              <span class="metric-value" id="trust-target">35%</span>
+            </div>
+            <div class="metric-bar">
+              <div class="metric-bar-fill warning" id="trust-target-bar" style="width: 35%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="metric-group">
+          <div class="metric-group-label">Organization</div>
+          
+          <div class="metric">
+            <div class="metric-header">
+              <span class="metric-name">Merger Syndrome</span>
+              <span class="metric-value warning" id="merger-syndrome">42%</span>
+            </div>
+            <div class="metric-bar">
+              <div class="metric-bar-fill warning" id="merger-syndrome-bar" style="width: 42%"></div>
+            </div>
+          </div>
+          
+          <div class="metric">
+            <div class="metric-header">
+              <span class="metric-name">Cultural Friction</span>
+              <span class="metric-value" id="cultural-friction">55%</span>
+            </div>
+            <div class="metric-bar">
+              <div class="metric-bar-fill warning" id="cultural-friction-bar" style="width: 55%"></div>
+            </div>
+          </div>
+          
+          <div class="metric">
+            <div class="metric-header">
+              <span class="metric-name">Rumor Activity</span>
+              <span class="metric-value" id="rumors">30%</span>
+            </div>
+            <div class="metric-bar">
+              <div class="metric-bar-fill" id="rumors-bar" style="width: 30%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="metric-group">
+          <div class="metric-group-label">Pressure</div>
+          
+          <div class="metric">
+            <div class="metric-header">
+              <span class="metric-name">Board Pressure</span>
+              <span class="metric-value" id="board-pressure">25%</span>
+            </div>
+            <div class="metric-bar">
+              <div class="metric-bar-fill" id="board-pressure-bar" style="width: 25%"></div>
+            </div>
+          </div>
+          
+          <div class="metric">
+            <div class="metric-header">
+              <span class="metric-name">Synergy Progress</span>
+              <span class="metric-value good" id="synergy">15%</span>
+            </div>
+            <div class="metric-bar">
+              <div class="metric-bar-fill good" id="synergy-bar" style="width: 15%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="metric-group">
+          <div class="metric-group-label">Retention</div>
+          
+          <div class="metric">
+            <div class="metric-header">
+              <span class="metric-name">Key Talent Retained</span>
+              <span class="metric-value good" id="retention">100%</span>
+            </div>
+            <div class="metric-bar">
+              <div class="metric-bar-fill good" id="retention-bar" style="width: 100%"></div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Content Area -->
+      <main class="main-content">
+        <div class="scene-container">
+          <div class="scene-header">
+            <div class="scene-phase-tag" id="scene-phase">Phase 0: Pre-Announcement</div>
+            <h2 class="scene-title" id="scene-title">The Deal is Signed</h2>
+          </div>
+          
+          <div class="scene-narrative" id="scene-narrative">
+            The ink is dry. Nexus Corp has acquired Meridian Technologies for $2.4 billion. 
+            The financial models project $180 million in annual synergies. The board is euphoric. 
+            The market is watching.<br><br>
+            But the deal isn't public yet. You have seven days before the announcement. 
+            Every decision you make now will echo through the next twelve months.
+          </div>
+
+          <div id="event-container"></div>
+
+          <div class="card-section">
+            <div class="card-section-header">
+              <div class="card-section-title">Your Decisions</div>
+              <div class="cards-remaining" id="cards-remaining">Select 1 card to play</div>
+            </div>
+            
+            <div class="card-hand" id="card-hand">
+              <!-- Cards will be injected here -->
+            </div>
+
+            <button class="play-card-btn" id="play-card-btn">Play Selected Card</button>
+          </div>
+        </div>
+      </main>
+
+      <!-- Right Sidebar: Intel -->
+      <aside class="intel-panel">
+        <div class="intel-title">Intelligence Feed</div>
+        
+        <div id="intel-feed">
+          <div class="intel-item">
+            <div class="intel-item-header">
+              <span class="intel-item-type">Background</span>
+              <span class="intel-item-day">Day -7</span>
+            </div>
+            <div class="intel-item-text">
+              Meridian's culture is known for flat hierarchy and fast decision-making. 
+              Nexus operates with formal approval chains. Friction is expected.
+            </div>
+          </div>
+        </div>
+
+        <div class="flight-risks">
+          <div class="metrics-title">Flight Risk Watch</div>
+          <div id="flight-risk-list">
+            <div class="flight-risk-person">
+              <div class="flight-risk-avatar">SK</div>
+              <div class="flight-risk-info">
+                <div class="flight-risk-name">Sarah Kim</div>
+                <div class="flight-risk-role">VP Sales, Meridian</div>
+              </div>
+              <div class="flight-risk-level medium">65%</div>
+            </div>
+            <div class="flight-risk-person">
+              <div class="flight-risk-avatar">MR</div>
+              <div class="flight-risk-info">
+                <div class="flight-risk-name">Marcus Rodriguez</div>
+                <div class="flight-risk-role">CTO, Meridian</div>
+              </div>
+              <div class="flight-risk-level high">78%</div>
+            </div>
+            <div class="flight-risk-person">
+              <div class="flight-risk-avatar">JC</div>
+              <div class="flight-risk-info">
+                <div class="flight-risk-name">James Chen</div>
+                <div class="flight-risk-role">Head of Product, Meridian</div>
+              </div>
+              <div class="flight-risk-level medium">52%</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- ==================== RESULT SCREEN ==================== -->
+  <div id="result-screen">
+    <div class="result-container">
+      <div class="result-badge" id="result-badge">Integration Complete</div>
+      <h1 class="result-title" id="result-title">The Verdict</h1>
+      <p class="result-narrative" id="result-narrative">
+        Loading your integration outcome...
+      </p>
+
+      <div class="result-metrics" id="result-metrics">
+        <!-- Will be populated -->
+      </div>
+
+      <div class="result-outcome" id="result-outcome">
+        <h3>Your Career Outcome</h3>
+        <p id="career-outcome">Loading...</p>
+      </div>
+
+      <div class="result-buttons">
+        <button class="download-checklist-btn" id="download-checklist-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Download Your Playbook
+        </button>
+        <button class="play-again-btn" id="play-again-btn">Try Different Archetype</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==================== GAME STATE ====================
+    const GameState = {
+      role: null,
+      currentPhase: 0,
+      currentSceneIndex: 0,
+      day: -7,
+      
+      // Scenario variation (randomized each game)
+      scenario: {
+        dealType: null, // 'growth', 'cost_synergy', 'merger_of_equals'
+        culturalGap: null, // 'low', 'medium', 'high'
+        targetSize: null, // 'small', 'medium', 'large'
+        industryContext: null, // 'stable', 'disrupted', 'crisis'
+        acquirerName: 'Nexus Corp',
+        targetName: 'Meridian Technologies'
+      },
+
+      // Core metrics (0-100)
+      metrics: {
+        trustAcquirer: 65,
+        trustTarget: 35,
+        mergerSyndrome: 42,
+        culturalFriction: 55,
+        rumors: 30,
+        boardPressure: 25,
+        synergy: 15,
+        retention: 100
+      },
+
+      // Scoring dimensions (tracked throughout)
+      scores: {
+        communicationTiming: 50,
+        retentionStrategy: 50,
+        culturalSensitivity: 50,
+        decisionSpeed: 50,
+        stakeholderManagement: 50,
+        adaptability: 50
+      },
+
+      // Key talent (randomized each game)
+      keyTalent: [],
+
+      // Intel log
+      intelLog: [],
+
+      // Decisions made (for outcome calculation and checklist personalization)
+      decisions: [],
+
+      // Events triggered
+      eventsTriggered: [],
+
+      // Mistakes made (for checklist personalization)
+      mistakes: [],
+
+      // Active scenes for this playthrough
+      activeScenes: []
+    };
+
+    // ==================== SCENARIO RANDOMIZATION ====================
+    const COMPANY_NAMES = {
+      acquirer: ['Nexus Corp', 'Vertex Holdings', 'Ascend Global', 'Prism Industries', 'Catalyst Group'],
+      target: ['Meridian Technologies', 'Horizon Labs', 'Apex Solutions', 'Quantum Dynamics', 'Elevate Systems']
+    };
+
+    // Kenji's Four M&A Archetypes — fundamentally different situations requiring different strategies
+    const ARCHETYPES = {
+      absorption: {
+        name: 'The Absorption',
+        tagline: 'Speed over sentiment. The target disappears.',
+        description: 'Classic acquisition — acquirer dominates, target brand fades. Speed matters. Retention is secondary to integration velocity. The goal is rapid assimilation.',
+        whyItMatters: 'In absorptions, prolonged uncertainty is more damaging than fast decisions that upset some people. The target employees already know they\'re being absorbed — pretending otherwise insults their intelligence and delays the inevitable.',
+        startingConditions: {
+          trustAcquirer: 70,
+          trustTarget: 25,
+          mergerSyndrome: 55,
+          culturalFriction: 45,
+          rumors: 35,
+          boardPressure: 35,
+          synergy: 10,
+          retention: 100
+        },
+        flightRiskMod: 20,
+        winCondition: 'Synergies realized quickly. Some talent loss is acceptable if integration is fast.',
+        failureMode: 'Talent exodus stalls integration. Cultural resistance creates guerrilla warfare.',
+        strategicAdvice: 'Move fast, communicate clearly about the "new reality," and don\'t pretend it\'s a merger of equals when it isn\'t.'
+      },
+      merger_of_equals: {
+        name: 'The Merger of Equals',
+        tagline: 'Political minefield. Trust is everything.',
+        description: 'Both companies bring significant value. Leadership positions are contested. Every decision signals who\'s "really" in charge. Trust is the scarcest resource.',
+        whyItMatters: 'Mergers of equals fail when one side feels like they "lost." Every appointment, every policy choice, every office location decision will be scrutinized for bias. Perception of fairness matters as much as actual fairness.',
+        startingConditions: {
+          trustAcquirer: 50,
+          trustTarget: 50,
+          mergerSyndrome: 40,
+          culturalFriction: 65,
+          rumors: 50,
+          boardPressure: 30,
+          synergy: 20,
+          retention: 100
+        },
+        flightRiskMod: 10,
+        winCondition: 'Both sides feel heard. Leadership team is genuinely mixed. Cultural integration succeeds.',
+        failureMode: 'One side "wins" and the other disengages. Political infighting paralyzes decisions.',
+        strategicAdvice: 'Symbolism matters enormously. Every appointment, every decision will be scrutinized for bias. Fairness perception is as important as fairness reality.'
+      },
+      talent_acquisition: {
+        name: 'The Talent Acquisition',
+        tagline: 'You bought the people. If they leave, the deal is worthless.',
+        description: 'The target\'s primary value is its talent — engineers, creatives, or specialists. The IP walks out the door every night. Retention isn\'t a priority; it\'s THE priority.',
+        whyItMatters: 'When you acquire a company for its people, every departure destroys enterprise value. A 20% attrition rate might mean 80% of the deal\'s value just walked out the door. Golden handcuffs help, but people stay for autonomy and growth, not just money.',
+        startingConditions: {
+          trustAcquirer: 60,
+          trustTarget: 40,
+          mergerSyndrome: 35,
+          culturalFriction: 50,
+          rumors: 25,
+          boardPressure: 45,
+          synergy: 5,
+          retention: 100
+        },
+        flightRiskMod: 30, // Much higher baseline flight risk
+        winCondition: 'Key talent stays AND remains engaged. Synergies are secondary to retention.',
+        failureMode: 'Talent leaves within 18 months. Acquirer paid billions for an empty building.',
+        strategicAdvice: 'Retention bonuses are necessary but not sufficient. People stay for autonomy, growth, and feeling valued — not just money.'
+      },
+      rescue: {
+        name: 'The Rescue',
+        tagline: 'Cost synergies are urgent. Employees expect layoffs.',
+        description: 'Target is struggling — financially, competitively, or operationally. The acquisition is partly a lifeline, partly a cost play. Employees know cuts are coming.',
+        whyItMatters: 'In a rescue, employees already expect bad news. Your only asset is honesty. Trying to sugarcoat inevitable layoffs destroys trust faster than the layoffs themselves. The survivors\' morale depends on how you treat those who leave.',
+        startingConditions: {
+          trustAcquirer: 65,
+          trustTarget: 35,
+          mergerSyndrome: 70,
+          culturalFriction: 40,
+          rumors: 60,
+          boardPressure: 60,
+          synergy: 0,
+          retention: 100
+        },
+        flightRiskMod: 15,
+        winCondition: 'Cost synergies achieved without destroying morale. Survivors feel secure, not guilty.',
+        failureMode: 'Best people leave (they have options). Survivors are traumatized and disengaged.',
+        strategicAdvice: 'Honesty is your only asset. Don\'t pretend there won\'t be cuts. Be clear about timeline, criteria, and support for those affected.'
+      }
+    };
+
+    const TALENT_POOL = [
+      { id: 'sarah', name: 'Sarah Kim', initials: 'SK', roleTemplate: 'VP Sales', baseFlightRisk: 65 },
+      { id: 'marcus', name: 'Marcus Rodriguez', initials: 'MR', roleTemplate: 'CTO', baseFlightRisk: 78 },
+      { id: 'james', name: 'James Chen', initials: 'JC', roleTemplate: 'Head of Product', baseFlightRisk: 52 },
+      { id: 'elena', name: 'Elena Vasquez', initials: 'EV', roleTemplate: 'VP Engineering', baseFlightRisk: 45 },
+      { id: 'david', name: 'David Park', initials: 'DP', roleTemplate: 'Sales Director', baseFlightRisk: 30 },
+      { id: 'aisha', name: 'Aisha Patel', initials: 'AP', roleTemplate: 'VP Operations', baseFlightRisk: 55 },
+      { id: 'tom', name: 'Tom Brennan', initials: 'TB', roleTemplate: 'CFO', baseFlightRisk: 40 },
+      { id: 'lisa', name: 'Lisa Wong', initials: 'LW', roleTemplate: 'Chief Revenue Officer', baseFlightRisk: 70 },
+      { id: 'raj', name: 'Raj Krishnamurthy', initials: 'RK', roleTemplate: 'VP Customer Success', baseFlightRisk: 48 },
+      { id: 'michelle', name: 'Michelle Oduya', initials: 'MO', roleTemplate: 'Head of HR', baseFlightRisk: 35 }
+    ];
+
+    // Random Crisis Events Pool — 2-3 drawn per playthrough for adaptive expertise
+    const CRISIS_EVENT_POOL = [
+      {
+        id: 'key_customer_threat',
+        name: 'Key Customer Ultimatum',
+        phase: 1,
+        triggerCondition: (state) => state.keyTalent.some(t => t.roleTemplate.includes('Sales') && t.flightRisk > 55),
+        event: {
+          type: 'alert',
+          text: 'CUSTOMER CRISIS: Your largest client called the CEO directly. They want written assurance their account team isn\'t leaving, or they\'re "exploring alternatives." Revenue at risk: $12M annually.'
+        },
+        effects: { boardPressure: 20, rumors: 10 },
+        cards: [
+          {
+            id: 'crisis_customer_ceo_call',
+            type: 'Leadership',
+            title: 'CEO Calls Customer Personally',
+            description: 'Powerful reassurance but commits leadership time and creates precedent.',
+            effects: [
+              { metric: 'boardPressure', delta: -15, label: '-15 Board Pressure' },
+              { metric: 'synergy', delta: +5, label: '+5 Synergy' }
+            ]
+          },
+          {
+            id: 'crisis_customer_account_plan',
+            type: 'Strategy',
+            title: 'Present Account Continuity Plan',
+            description: 'Detailed transition plan showing stability. Professional but impersonal.',
+            effects: [
+              { metric: 'boardPressure', delta: -8, label: '-8 Board Pressure' },
+              { metric: 'trustAcquirer', delta: +5, label: '+5 Acquirer Trust' }
+            ]
+          },
+          {
+            id: 'crisis_customer_ignore',
+            type: 'Strategy',
+            title: 'Standard Account Management Response',
+            description: 'Don\'t escalate. Risk: they interpret silence as confirmation of fears.',
+            effects: [
+              { metric: 'boardPressure', delta: +10, label: '+10 Board Pressure' },
+              { metric: 'synergy', delta: -10, label: '-10 Synergy' }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'glassdoor_viral',
+        name: 'Glassdoor Review Goes Viral',
+        phase: 1,
+        triggerCondition: (state) => state.metrics.rumors > 35,
+        event: {
+          type: 'alert',
+          text: 'REPUTATION CRISIS: A scathing Glassdoor review titled "Integration Nightmare" is trending on LinkedIn. 2,000+ shares. The press is calling for comment.'
+        },
+        effects: { mergerSyndrome: 15, trustTarget: -10 },
+        cards: [
+          {
+            id: 'crisis_glassdoor_acknowledge',
+            type: 'Communication',
+            title: 'Public Acknowledgment',
+            description: 'CEO posts response acknowledging concerns and committing to transparency. Risky but authentic.',
+            effects: [
+              { metric: 'trustTarget', delta: +15, label: '+15 Target Trust' },
+              { metric: 'trustAcquirer', delta: +8, label: '+8 Acquirer Trust' },
+              { metric: 'boardPressure', delta: +10, label: '+10 Board Pressure' }
+            ]
+          },
+          {
+            id: 'crisis_glassdoor_internal',
+            type: 'Communication',
+            title: 'Internal Town Hall Only',
+            description: 'Address it internally, don\'t feed the external narrative.',
+            effects: [
+              { metric: 'trustTarget', delta: +5, label: '+5 Target Trust' },
+              { metric: 'rumors', delta: +15, label: '+15 Rumors' }
+            ]
+          },
+          {
+            id: 'crisis_glassdoor_silence',
+            type: 'Strategy',
+            title: 'No Comment',
+            description: 'Let it blow over. Risk: employees interpret silence as indifference.',
+            effects: [
+              { metric: 'mergerSyndrome', delta: +20, label: '+20 Merger Syndrome' },
+              { metric: 'trustTarget', delta: -15, label: '-15 Target Trust' }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'executive_poaching',
+        name: 'Competitor Poaching Raid',
+        phase: 2,
+        triggerCondition: (state) => state.keyTalent.filter(t => t.flightRisk > 60).length >= 2,
+        event: {
+          type: 'alert',
+          text: 'TALENT EMERGENCY: Competitor is running coordinated poaching campaign. Three key executives received offers this week. One has already accepted — quietly.'
+        },
+        effects: { retention: -10 },
+        cards: [
+          {
+            id: 'crisis_poach_counter',
+            type: 'Retention',
+            title: 'Counter-Offer War',
+            description: 'Match or beat competitor offers. Expensive and may create internal equity issues.',
+            effects: [
+              { special: 'reduce_flight_risk', targets: 'all', amount: 20, label: '-20 Flight Risk (All)' },
+              { metric: 'boardPressure', delta: +15, label: '+15 Board Pressure' }
+            ]
+          },
+          {
+            id: 'crisis_poach_accelerate',
+            type: 'Leadership',
+            title: 'Accelerate Role Clarity',
+            description: 'Fast-track org announcements to give certainty. Addresses root cause, not symptom.',
+            effects: [
+              { special: 'reduce_flight_risk', targets: 'all', amount: 15, label: '-15 Flight Risk (All)' },
+              { metric: 'mergerSyndrome', delta: -15, label: '-15 Merger Syndrome' }
+            ]
+          },
+          {
+            id: 'crisis_poach_let_go',
+            type: 'Strategy',
+            title: 'Accept Some Losses',
+            description: 'Focus retention on the most critical roles. Let others go if they want to.',
+            effects: [
+              { special: 'random_departure', label: 'Random Departure' },
+              { metric: 'retention', delta: -15, label: '-15 Retention' },
+              { metric: 'boardPressure', delta: +5, label: '+5 Board Pressure' }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'integration_revolt',
+        name: 'Integration Team Revolt',
+        phase: 2,
+        triggerCondition: (state) => state.metrics.culturalFriction > 55 && state.metrics.mergerSyndrome > 50,
+        event: {
+          type: 'alert',
+          text: 'CULTURE CRISIS: Target company employees on the integration team are refusing to implement the new systems. They say the process "ignores everything that made us successful."'
+        },
+        effects: { culturalFriction: 15, synergy: -10 },
+        cards: [
+          {
+            id: 'crisis_revolt_pause',
+            type: 'Leadership',
+            title: 'Pause and Listen',
+            description: 'Stop integration workstreams for a week. Conduct listening sessions. Lose momentum to gain buy-in.',
+            effects: [
+              { metric: 'culturalFriction', delta: -20, label: '-20 Cultural Friction' },
+              { metric: 'trustTarget', delta: +20, label: '+20 Target Trust' },
+              { metric: 'boardPressure', delta: +20, label: '+20 Board Pressure' },
+              { metric: 'synergy', delta: -10, label: '-10 Synergy' }
+            ]
+          },
+          {
+            id: 'crisis_revolt_compromise',
+            type: 'Strategy',
+            title: 'Hybrid Approach',
+            description: 'Adopt some of their systems, keep some of yours. Messy but collaborative.',
+            effects: [
+              { metric: 'culturalFriction', delta: -10, label: '-10 Cultural Friction' },
+              { metric: 'synergy', delta: -5, label: '-5 Synergy' },
+              { metric: 'trustTarget', delta: +10, label: '+10 Target Trust' }
+            ]
+          },
+          {
+            id: 'crisis_revolt_override',
+            type: 'Strategy',
+            title: 'Enforce the Plan',
+            description: 'Integration plan was approved. Execute it. Sometimes leadership means being unpopular.',
+            effects: [
+              { metric: 'synergy', delta: +15, label: '+15 Synergy' },
+              { metric: 'culturalFriction', delta: +25, label: '+25 Cultural Friction' },
+              { metric: 'trustTarget', delta: -25, label: '-25 Target Trust' },
+              { special: 'increase_flight_risk', targets: 'all_target', amount: 20, label: '+20 Flight Risk (Target)' }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'board_ultimatum',
+        name: 'Board Demands Results',
+        phase: 3,
+        triggerCondition: (state) => state.metrics.synergy < 35 && state.metrics.boardPressure > 50,
+        event: {
+          type: 'alert',
+          text: 'BOARD CRISIS: The board is losing patience. They want to see $50M in synergies by month-end or "significant changes to integration leadership." That includes you.'
+        },
+        effects: { boardPressure: 20 },
+        cards: [
+          {
+            id: 'crisis_board_accelerate',
+            type: 'Strategy',
+            title: 'Accelerate Cost Cuts',
+            description: 'Hit the number with aggressive headcount reduction. Synergies achieved. Morale destroyed.',
+            effects: [
+              { metric: 'synergy', delta: +30, label: '+30 Synergy' },
+              { metric: 'boardPressure', delta: -25, label: '-25 Board Pressure' },
+              { metric: 'mergerSyndrome', delta: +30, label: '+30 Merger Syndrome' },
+              { metric: 'retention', delta: -20, label: '-20 Retention' },
+              { special: 'increase_flight_risk', targets: 'all', amount: 25, label: '+25 Flight Risk (All)' }
+            ]
+          },
+          {
+            id: 'crisis_board_revenue',
+            type: 'Strategy',
+            title: 'Pivot to Revenue Synergies',
+            description: 'Argue that cost cuts are a false economy. Cross-selling will generate more long-term value.',
+            effects: [
+              { metric: 'synergy', delta: +10, label: '+10 Synergy' },
+              { metric: 'boardPressure', delta: +10, label: '+10 Board Pressure' },
+              { metric: 'trustTarget', delta: +15, label: '+15 Target Trust' }
+            ]
+          },
+          {
+            id: 'crisis_board_reset',
+            type: 'Leadership',
+            title: 'Request Timeline Reset',
+            description: 'Tell the board the original projections were unrealistic. Risk your job to save the integration.',
+            effects: [
+              { metric: 'boardPressure', delta: +25, label: '+25 Board Pressure' },
+              { metric: 'trustTarget', delta: +20, label: '+20 Target Trust' },
+              { metric: 'trustAcquirer', delta: +15, label: '+15 Acquirer Trust' },
+              { metric: 'mergerSyndrome', delta: -15, label: '-15 Merger Syndrome' }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'media_investigation',
+        name: 'Journalist Investigation',
+        phase: 2,
+        triggerCondition: (state) => state.metrics.rumors > 45 || state.keyTalent.some(t => t.departed),
+        event: {
+          type: 'warning',
+          text: 'MEDIA ALERT: A business journalist is writing a piece on "troubled M&A integrations." They\'ve reached out to former employees and are requesting an interview with the CEO.'
+        },
+        effects: { rumors: 15 },
+        cards: [
+          {
+            id: 'crisis_media_interview',
+            type: 'Communication',
+            title: 'Grant the Interview',
+            description: 'Control the narrative. But the journalist has tough questions ready.',
+            effects: [
+              { metric: 'rumors', delta: -15, label: '-15 Rumors' },
+              { metric: 'trustTarget', delta: +10, label: '+10 Target Trust' },
+              { metric: 'trustAcquirer', delta: +5, label: '+5 Acquirer Trust' }
+            ]
+          },
+          {
+            id: 'crisis_media_statement',
+            type: 'Communication',
+            title: 'Written Statement Only',
+            description: 'Polished PR response. Safe but may look like you\'re hiding.',
+            effects: [
+              { metric: 'rumors', delta: +5, label: '+5 Rumors' },
+              { metric: 'boardPressure', delta: -5, label: '-5 Board Pressure' }
+            ]
+          },
+          {
+            id: 'crisis_media_decline',
+            type: 'Strategy',
+            title: 'Decline Comment',
+            description: 'Don\'t engage. The story runs anyway, without your input.',
+            effects: [
+              { metric: 'rumors', delta: +20, label: '+20 Rumors' },
+              { metric: 'mergerSyndrome', delta: +10, label: '+10 Merger Syndrome' }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'positive_momentum',
+        name: 'Unexpected Win',
+        phase: 2,
+        triggerCondition: (state) => state.metrics.trustTarget > 45 && state.metrics.culturalFriction < 50,
+        event: {
+          type: 'positive',
+          text: 'GOOD NEWS: A cross-company team just landed a major new client — the first win "as one company." It\'s generating genuine excitement on both sides.'
+        },
+        effects: { trustTarget: 10, trustAcquirer: 10 },
+        cards: [
+          {
+            id: 'crisis_win_celebrate',
+            type: 'Communication',
+            title: 'Major Celebration',
+            description: 'Make this a defining moment. Company-wide announcement, bonus for the team.',
+            effects: [
+              { metric: 'mergerSyndrome', delta: -20, label: '-20 Merger Syndrome' },
+              { metric: 'culturalFriction', delta: -15, label: '-15 Cultural Friction' },
+              { special: 'reduce_flight_risk', targets: 'all', amount: 10, label: '-10 Flight Risk (All)' }
+            ]
+          },
+          {
+            id: 'crisis_win_modest',
+            type: 'Communication',
+            title: 'Acknowledge Quietly',
+            description: 'Mention it in the newsletter. Don\'t overhype — there\'s still work to do.',
+            effects: [
+              { metric: 'mergerSyndrome', delta: -5, label: '-5 Merger Syndrome' },
+              { metric: 'synergy', delta: +5, label: '+5 Synergy' }
+            ]
+          },
+          {
+            id: 'crisis_win_leverage',
+            type: 'Strategy',
+            title: 'Use It to Push Integration',
+            description: '"See what we can do together? Now let\'s accelerate." Risk: feels manipulative.',
+            effects: [
+              { metric: 'synergy', delta: +15, label: '+15 Synergy' },
+              { metric: 'boardPressure', delta: -10, label: '-10 Board Pressure' },
+              { metric: 'trustTarget', delta: -5, label: '-5 Target Trust' }
+            ]
+          }
+        ]
+      }
+    ];
+
+    function randomizeScenario() {
+      // Select archetype
+      const archetypeKeys = Object.keys(ARCHETYPES);
+      const selectedArchetypeKey = archetypeKeys[Math.floor(Math.random() * archetypeKeys.length)];
+      GameState.scenario.archetype = selectedArchetypeKey;
+      const archetype = ARCHETYPES[selectedArchetypeKey];
+
+      // Deal type maps from archetype
+      const archetypeToDealType = {
+        'absorption': 'absorption',
+        'merger_of_equals': 'merger_of_equals',
+        'talent_acquisition': 'talent_acquisition',
+        'rescue': 'rescue'
+      };
+      GameState.scenario.dealType = archetypeToDealType[selectedArchetypeKey];
+
+      // Cultural gap (influenced by archetype)
+      const culturalGaps = ['low', 'medium', 'high'];
+      if (selectedArchetypeKey === 'merger_of_equals') {
+        GameState.scenario.culturalGap = Math.random() > 0.3 ? 'high' : 'medium';
+      } else if (selectedArchetypeKey === 'absorption') {
+        GameState.scenario.culturalGap = culturalGaps[Math.floor(Math.random() * culturalGaps.length)];
+      } else {
+        GameState.scenario.culturalGap = Math.random() > 0.5 ? 'medium' : 'low';
+      }
+
+      // Target size
+      const targetSizes = ['small', 'medium', 'large'];
+      if (selectedArchetypeKey === 'merger_of_equals') {
+        GameState.scenario.targetSize = Math.random() > 0.5 ? 'large' : 'medium';
+      } else if (selectedArchetypeKey === 'absorption') {
+        GameState.scenario.targetSize = Math.random() > 0.7 ? 'medium' : 'small';
+      } else {
+        GameState.scenario.targetSize = targetSizes[Math.floor(Math.random() * targetSizes.length)];
+      }
+
+      // Industry context
+      const contexts = ['stable', 'disrupted', 'crisis'];
+      if (selectedArchetypeKey === 'rescue') {
+        GameState.scenario.industryContext = Math.random() > 0.3 ? 'crisis' : 'disrupted';
+      } else {
+        GameState.scenario.industryContext = contexts[Math.floor(Math.random() * contexts.length)];
+      }
+
+      // Company names
+      GameState.scenario.acquirerName = COMPANY_NAMES.acquirer[Math.floor(Math.random() * COMPANY_NAMES.acquirer.length)];
+      GameState.scenario.targetName = COMPANY_NAMES.target[Math.floor(Math.random() * COMPANY_NAMES.target.length)];
+
+      // Apply archetype starting conditions
+      GameState.metrics = { ...archetype.startingConditions };
+
+      // Select 5 random key talent
+      const shuffled = [...TALENT_POOL].sort(() => Math.random() - 0.5);
+      const selected = shuffled.slice(0, 5);
+      
+      // Assign to companies (first 3 target, last 2 acquirer)
+      GameState.keyTalent = selected.map((person, i) => {
+        const isTarget = i < 3;
+        const company = isTarget ? GameState.scenario.targetName : GameState.scenario.acquirerName;
+        
+        // Adjust flight risk based on archetype
+        let flightRiskMod = archetype.flightRiskMod;
+        if (GameState.scenario.culturalGap === 'high') flightRiskMod += 10;
+        if (GameState.scenario.industryContext === 'disrupted') flightRiskMod += 5;
+        if (!isTarget) flightRiskMod -= 25; // Acquirer employees less at risk
+
+        return {
+          ...person,
+          role: `${person.roleTemplate}, ${company}`,
+          flightRisk: Math.min(95, Math.max(15, person.baseFlightRisk + flightRiskMod + (Math.random() * 20 - 10))),
+          departed: false,
+          isTarget: isTarget
+        };
+      });
+
+      // Additional metric adjustments based on scenario
+      if (GameState.scenario.culturalGap === 'high') {
+        GameState.metrics.culturalFriction = Math.min(90, GameState.metrics.culturalFriction + 15);
+      }
+
+      if (GameState.scenario.industryContext === 'crisis') {
+        GameState.metrics.boardPressure = Math.min(90, GameState.metrics.boardPressure + 15);
+      }
+
+      if (GameState.scenario.targetSize === 'large') {
+        GameState.metrics.culturalFriction = Math.min(90, GameState.metrics.culturalFriction + 10);
+        GameState.metrics.mergerSyndrome = Math.min(90, GameState.metrics.mergerSyndrome + 10);
+      }
+
+      // Select 2-3 random crisis events for this playthrough
+      const eligibleCrises = CRISIS_EVENT_POOL.filter(c => c.id !== 'positive_momentum');
+      const shuffledCrises = [...eligibleCrises].sort(() => Math.random() - 0.5);
+      const numCrises = Math.random() > 0.5 ? 3 : 2;
+      GameState.scenario.crisisEvents = shuffledCrises.slice(0, numCrises);
+      
+      // Always include one positive event possibility
+      if (Math.random() > 0.4) {
+        const positiveEvent = CRISIS_EVENT_POOL.find(c => c.id === 'positive_momentum');
+        if (positiveEvent) {
+          GameState.scenario.crisisEvents.push(positiveEvent);
+        }
+      }
+
+      GameState.scenario.triggeredCrises = [];
+    }
+
+    function getScenarioDescription() {
+      const archetype = ARCHETYPES[GameState.scenario.archetype];
+      const cg = {
+        'low': 'Similar cultures — but don\'t get complacent',
+        'medium': 'Moderate cultural differences — friction likely',
+        'high': 'Significant cultural gap — high conflict risk'
+      };
+      const ts = {
+        'small': `${GameState.scenario.targetName} is 30% the size of ${GameState.scenario.acquirerName}`,
+        'medium': `${GameState.scenario.targetName} is 50% the size of ${GameState.scenario.acquirerName}`,
+        'large': `${GameState.scenario.targetName} is 80% the size of ${GameState.scenario.acquirerName} — power dynamics are complex`
+      };
+      const ic = {
+        'stable': 'Industry is stable — you have time, but not forever',
+        'disrupted': 'Industry is disrupted — competitors are circling',
+        'crisis': 'Industry in crisis — board pressure will be intense'
+      };
+
+      return {
+        archetype: archetype.name,
+        archetypeTagline: archetype.tagline,
+        archetypeDescription: archetype.description,
+        winCondition: archetype.winCondition,
+        failureMode: archetype.failureMode,
+        strategicAdvice: archetype.strategicAdvice,
+        culturalGap: cg[GameState.scenario.culturalGap],
+        targetSize: ts[GameState.scenario.targetSize],
+        industryContext: ic[GameState.scenario.industryContext]
+      };
+    }
+
+    // ==================== GRADING SYSTEM ====================
+    // Kenji's Five Competency Dimensions — transparent and coachable
+    const COMPETENCY_DIMENSIONS = {
+      communicationTransparency: {
+        name: 'Communication & Transparency',
+        description: 'Did you keep people informed? Did you fill vacuums before rumors did?',
+        weight: 0.22
+      },
+      talentRetention: {
+        name: 'Talent Retention',
+        description: 'Did you keep the people who mattered? Did they stay engaged?',
+        weight: 0.25
+      },
+      culturalIntelligence: {
+        name: 'Cultural Intelligence',
+        description: 'Did you navigate the friction or inflame it? Did you respect both sides?',
+        weight: 0.20
+      },
+      strategicExecution: {
+        name: 'Strategic Execution',
+        description: 'Did you hit the synergies without breaking the organization?',
+        weight: 0.18
+      },
+      leadershipPresence: {
+        name: 'Leadership Presence',
+        description: 'Did you show up when it mattered? Did you make the hard calls?',
+        weight: 0.15
+      }
+    };
+
+    function calculateGrade() {
+      const m = GameState.metrics;
+      const s = GameState.scores;
+      const archetype = ARCHETYPES[GameState.scenario.archetype];
+
+      // Debug logging
+      console.log('=== GRADE CALCULATION ===');
+      console.log('Metrics:', JSON.stringify(m));
+      console.log('Scores:', JSON.stringify(s));
+
+      // Calculate dimension scores (0-100)
+      // Base scores start at 50, bonuses from card choices can add 8-10 per good choice
+      // With 8 scenes, good play could add 40-80 points to relevant scores
+      const dimensions = {};
+
+      // Communication & Transparency
+      // Score range: communicationTiming (50 base + up to 40 from cards), rumors (0-100 inverted), trust avg
+      dimensions.communicationTransparency = 
+        Math.min(100, s.communicationTiming) * 0.35 +
+        (100 - m.rumors) * 0.35 +
+        ((m.trustTarget + m.trustAcquirer) / 2) * 0.30;
+
+      // Talent Retention
+      const retainedCount = GameState.keyTalent.filter(t => !t.departed).length;
+      const retainedPct = (retainedCount / GameState.keyTalent.length) * 100;
+      const avgFlightRisk = GameState.keyTalent.filter(t => !t.departed).length > 0 
+        ? GameState.keyTalent.filter(t => !t.departed).reduce((sum, t) => sum + t.flightRisk, 0) / retainedCount
+        : 100;
+      dimensions.talentRetention = 
+        retainedPct * 0.50 +
+        Math.min(100, s.retentionStrategy) * 0.25 +
+        (100 - avgFlightRisk) * 0.25;
+
+      // Cultural Intelligence
+      dimensions.culturalIntelligence = 
+        (100 - m.culturalFriction) * 0.40 +
+        Math.min(100, s.culturalSensitivity) * 0.30 +
+        m.trustTarget * 0.30;
+
+      // Strategic Execution
+      // Synergy is hard to max out, so weight it less harshly
+      dimensions.strategicExecution = 
+        Math.min(m.synergy * 1.5, 100) * 0.35 +  // Amplify synergy contribution
+        (100 - m.boardPressure) * 0.30 +
+        Math.min(100, s.decisionSpeed) * 0.35;
+
+      // Leadership Presence
+      dimensions.leadershipPresence = 
+        Math.min(100, s.stakeholderManagement) * 0.35 +
+        Math.min(100, s.adaptability) * 0.35 +
+        ((m.trustAcquirer + m.trustTarget) / 2) * 0.30;
+
+      // Log dimension scores
+      console.log('Dimension scores (before normalization):');
+      Object.entries(dimensions).forEach(([k, v]) => console.log(`  ${k}: ${v.toFixed(1)}`));
+
+      // Normalize all to 0-100
+      Object.keys(dimensions).forEach(key => {
+        dimensions[key] = Math.min(100, Math.max(0, dimensions[key]));
+      });
+
+      // Calculate weighted overall score
+      let overallScore = 0;
+      Object.keys(COMPETENCY_DIMENSIONS).forEach(key => {
+        const contribution = dimensions[key] * COMPETENCY_DIMENSIONS[key].weight;
+        console.log(`  ${key}: ${dimensions[key].toFixed(1)} × ${COMPETENCY_DIMENSIONS[key].weight} = ${contribution.toFixed(1)}`);
+        overallScore += contribution;
+      });
+      console.log(`Base weighted score: ${overallScore.toFixed(1)}`);
+
+      // Archetype-specific adjustments - BONUS only, no penalties
+      // Reward players who excel at the archetype's key competency
+      let archetypeBonus = 0;
+      if (GameState.scenario.archetype === 'talent_acquisition') {
+        if (dimensions.talentRetention >= 80) archetypeBonus = 8;
+        else if (dimensions.talentRetention >= 60) archetypeBonus = 4;
+      } else if (GameState.scenario.archetype === 'absorption') {
+        if (dimensions.strategicExecution >= 70) archetypeBonus = 8;
+        else if (dimensions.strategicExecution >= 50) archetypeBonus = 4;
+      } else if (GameState.scenario.archetype === 'merger_of_equals') {
+        if (dimensions.culturalIntelligence >= 70) archetypeBonus = 8;
+        else if (dimensions.culturalIntelligence >= 50) archetypeBonus = 4;
+      } else if (GameState.scenario.archetype === 'rescue') {
+        if (dimensions.communicationTransparency >= 70) archetypeBonus = 8;
+        else if (dimensions.communicationTransparency >= 50) archetypeBonus = 4;
+      }
+      overallScore += archetypeBonus;
+      console.log(`Archetype bonus: +${archetypeBonus}`);
+
+      // Difficulty bonuses (reward harder scenarios)
+      let difficultyMod = 0;
+      if (GameState.scenario.culturalGap === 'high') difficultyMod += 3;
+      if (GameState.scenario.industryContext === 'crisis') difficultyMod += 4;
+      if (GameState.scenario.targetSize === 'large') difficultyMod += 2;
+      if (GameState.role === 'target') difficultyMod += 5;
+      if (GameState.role === 'outsider') difficultyMod += 3;
+      
+      overallScore += difficultyMod;
+      console.log(`Difficulty bonus: +${difficultyMod}`);
+
+      // Penalty for key talent departures (scaled - first departure hurts most)
+      const departed = GameState.keyTalent.filter(t => t.departed).length;
+      const departurePenalty = departed > 0 ? (departed * 4) + 2 : 0; // 6 for first, 4 for each additional
+      overallScore -= departurePenalty;
+      console.log(`Departure penalty: -${departurePenalty} (${departed} departed)`);
+
+      // Bonus for high retention
+      if (departed === 0) {
+        overallScore += 5;
+        console.log('Perfect retention bonus: +5');
+      }
+
+      // Ensure score is in valid range
+      overallScore = Math.min(100, Math.max(0, overallScore));
+      console.log(`FINAL SCORE: ${overallScore.toFixed(1)}`);
+
+      // Convert to letter grade - adjusted thresholds for better distribution
+      const gradeScale = [
+        { min: 92, grade: 'A+' },
+        { min: 87, grade: 'A' },
+        { min: 82, grade: 'A-' },
+        { min: 77, grade: 'B+' },
+        { min: 72, grade: 'B' },
+        { min: 67, grade: 'B-' },
+        { min: 62, grade: 'C+' },
+        { min: 57, grade: 'C' },
+        { min: 52, grade: 'C-' },
+        { min: 47, grade: 'D+' },
+        { min: 42, grade: 'D' },
+        { min: 37, grade: 'D-' },
+        { min: 0, grade: 'F' }
+      ];
+
+      let letterGrade = 'F';
+      for (const { min, grade } of gradeScale) {
+        if (overallScore >= min) {
+          letterGrade = grade;
+          break;
+        }
+      }
+      console.log(`LETTER GRADE: ${letterGrade}`);
+
+      // Identify strengths and weaknesses for coaching
+      const sortedDimensions = Object.entries(dimensions)
+        .map(([key, value]) => ({ key, value, name: COMPETENCY_DIMENSIONS[key].name }))
+        .sort((a, b) => b.value - a.value);
+
+      const strengths = sortedDimensions.slice(0, 2).filter(d => d.value >= 55);
+      const weaknesses = sortedDimensions.slice(-2).filter(d => d.value < 50);
+
+      return {
+        overall: overallScore,
+        letterGrade,
+        dimensions,
+        strengths,
+        weaknesses,
+        departed,
+        synergy: m.synergy,
+        retainedCount: GameState.keyTalent.filter(t => !t.departed).length,
+        totalTalent: GameState.keyTalent.length
+      };
+    }
+
+    function getDimensionGrade(score) {
+      if (score >= 90) return { grade: 'A', class: 'good', label: 'Excellent' };
+      if (score >= 80) return { grade: 'B+', class: 'good', label: 'Strong' };
+      if (score >= 70) return { grade: 'B', class: 'good', label: 'Good' };
+      if (score >= 60) return { grade: 'C+', class: 'warning', label: 'Adequate' };
+      if (score >= 50) return { grade: 'C', class: 'warning', label: 'Needs Work' };
+      if (score >= 40) return { grade: 'D', class: 'bad', label: 'Poor' };
+      return { grade: 'F', class: 'bad', label: 'Failed' };
+    }
+
+    // ==================== PERSONALIZED CHECKLIST GENERATOR ====================
+    function generateChecklist() {
+      const grade = calculateGrade();
+      const m = GameState.metrics;
+      const scenario = GameState.scenario;
+      
+      // Base checklist items
+      const checklist = {
+        preAnnouncement: [],
+        announcementDay: [],
+        firstThirtyDays: [],
+        integration: [],
+        ongoing: [],
+        personalizedInsights: []
+      };
+
+      // PRE-ANNOUNCEMENT
+      checklist.preAnnouncement = [
+        { item: 'Identify key talent at risk BEFORE announcement', priority: 'critical', learned: grade.dimensions.retentionStrategy < 60 },
+        { item: 'Prepare manager talking points and FAQs', priority: 'high', learned: m.rumors > 50 },
+        { item: 'Align C-suite on messaging and timing', priority: 'critical', learned: true },
+        { item: 'Brief legal on employee communication constraints', priority: 'high', learned: true },
+        { item: 'Prepare retention packages for flight-risk executives', priority: 'high', learned: GameState.keyTalent.some(t => t.departed) },
+        { item: 'Conduct cultural assessment of target company', priority: 'critical', learned: m.culturalFriction > 50 },
+        { item: 'Map decision-making style differences between companies', priority: 'medium', learned: m.culturalFriction > 60 }
+      ];
+
+      // ANNOUNCEMENT DAY
+      checklist.announcementDay = [
+        { item: 'Employees hear from leadership BEFORE press release', priority: 'critical', learned: grade.dimensions.communicationTiming < 60 },
+        { item: 'Have answers ready for: jobs, benefits, reporting structure', priority: 'critical', learned: true },
+        { item: 'CEO or senior leader visible at target company location', priority: 'high', learned: m.trustTarget < 40 },
+        { item: 'Provide channel for employees to ask questions', priority: 'high', learned: true },
+        { item: 'Brief customer-facing teams on client talking points', priority: 'medium', learned: true },
+        { item: 'Monitor social media and Glassdoor for sentiment', priority: 'medium', learned: m.rumors > 40 }
+      ];
+
+      // FIRST 30 DAYS
+      checklist.firstThirtyDays = [
+        { item: 'Announce org structure within 21 days (uncertainty kills)', priority: 'critical', learned: m.mergerSyndrome > 60 },
+        { item: 'Individual conversations with each key talent', priority: 'critical', learned: GameState.keyTalent.some(t => t.departed) },
+        { item: 'Weekly (minimum) all-hands updates', priority: 'high', learned: grade.dimensions.communicationTiming < 55 },
+        { item: 'Equip managers to answer team questions', priority: 'high', learned: m.rumors > 45 },
+        { item: 'Address "us vs. them" dynamics immediately when they surface', priority: 'critical', learned: m.culturalFriction > 55 },
+        { item: 'Establish integration management office (IMO)', priority: 'high', learned: true },
+        { item: 'Set clear 30/60/90 day milestones and communicate them', priority: 'medium', learned: true }
+      ];
+
+      // INTEGRATION PHASE
+      checklist.integration = [
+        { item: 'Match integration speed to organizational readiness', priority: 'critical', learned: m.mergerSyndrome > 65 },
+        { item: 'Prioritize "quick wins" that benefit both legacy companies', priority: 'high', learned: true },
+        { item: 'Create mixed teams (not acquirer teams absorbing target)', priority: 'high', learned: m.culturalFriction > 50 },
+        { item: 'Respond visibly to employee feedback', priority: 'high', learned: m.trustTarget < 45 },
+        { item: 'Celebrate progress milestones publicly', priority: 'medium', learned: true },
+        { item: 'Monitor flight risk continuously, not just at announcement', priority: 'critical', learned: GameState.keyTalent.filter(t => t.departed).length > 1 },
+        { item: 'Be willing to slow down if merger syndrome spikes', priority: 'high', learned: m.mergerSyndrome > 70 }
+      ];
+
+      // ONGOING
+      checklist.ongoing = [
+        { item: 'Pulse surveys every 30-60 days', priority: 'high', learned: true },
+        { item: 'Board reporting includes people metrics, not just financials', priority: 'medium', learned: m.boardPressure > 60 },
+        { item: 'Track synergy realization against realistic timelines', priority: 'high', learned: m.synergy < 40 },
+        { item: 'Culture integration continues past Year 1', priority: 'medium', learned: m.culturalFriction > 40 },
+        { item: 'Exit interviews with all departures — look for patterns', priority: 'medium', learned: true }
+      ];
+
+      // PERSONALIZED INSIGHTS based on what they struggled with
+      if (GameState.keyTalent.filter(t => t.departed).length >= 2) {
+        checklist.personalizedInsights.push({
+          insight: 'You lost multiple key executives. Research shows 47% of key talent leaves within Year 1 — your retention strategy must start in due diligence, not post-announcement.',
+          source: 'EY M&A Study'
+        });
+      }
+
+      if (m.culturalFriction > 55) {
+        checklist.personalizedInsights.push({
+          insight: 'Cultural friction remained high throughout your integration. Studies show 50-60% of M&A failures stem from cultural issues. Consider: did you treat culture as a "soft" issue while focusing on systems integration?',
+          source: 'Harvard Business Review'
+        });
+      }
+
+      if (grade.dimensions.communicationTiming < 50) {
+        checklist.personalizedInsights.push({
+          insight: 'Your communication timing struggled. McKinsey research shows poor communication contributes to 50% of merger failures. The vacuum you create gets filled by rumors.',
+          source: 'McKinsey & Company'
+        });
+      }
+
+      if (m.mergerSyndrome > 60) {
+        checklist.personalizedInsights.push({
+          insight: 'Merger syndrome peaked dangerously in your integration. This manifests as anxiety, decreased productivity, and disengagement. Speed of integration must be balanced against organizational capacity to absorb change.',
+          source: 'Marks & Mirvis Research'
+        });
+      }
+
+      if (m.boardPressure > 65 && m.synergy < 45) {
+        checklist.personalizedInsights.push({
+          insight: 'You faced intense board pressure while synergies lagged. Consider: were the original synergy targets realistic? 70-75% of M&As fail to meet their financial projections. Sometimes the bravest move is resetting expectations early.',
+          source: 'Lev & Gu, "The M&A Failure Trap"'
+        });
+      }
+
+      if (scenario.dealType === 'cost_synergy' && m.retention < 80) {
+        checklist.personalizedInsights.push({
+          insight: 'Cost synergy deals are retention nightmares by design — employees know layoffs are coming. Your challenge: be honest about what\'s happening while giving people reasons to stay and perform.',
+          source: 'Integration Best Practices'
+        });
+      }
+
+      // Add the critical warning
+      checklist.criticalWarning = `This checklist reflects patterns from your simulation — a ${scenario.dealType.replace('_', ' ')} with ${scenario.culturalGap} cultural gap in a ${scenario.industryContext} industry. Your actual M&A will differ. Checklists are starting points. Timing and the ability to pivot quickly based on real-time signals matter more than following any script.`;
+
+      return checklist;
+    }
+
+    function downloadChecklist() {
+      const checklist = generateChecklist();
+      const grade = calculateGrade();
+      const scenario = GameState.scenario;
+      const archetype = ARCHETYPES[scenario.archetype];
+      const scenarioDesc = getScenarioDescription();
+
+      // Decision explanations - what and why for each choice
+      const DECISION_EXPLANATIONS = {
+        'pre_brief_small': {
+          what: 'You kept the announcement circle tight to C-suite only.',
+          why: 'Fewer people means less leak risk, but managers were blindsided and unable to support their teams on Day 1. This trades short-term control for long-term trust damage.'
+        },
+        'pre_brief_vps': {
+          what: 'You briefed VP-level leaders before the announcement.',
+          why: 'VPs can cascade information and answer questions on Day 1. Research shows manager preparedness is one of the strongest predictors of integration success. The leak risk is real but manageable.'
+        },
+        'pre_brief_key_talent': {
+          what: 'You quietly approached key talent before the announcement.',
+          why: 'Personal outreach before announcements dramatically reduces flight risk. People who feel valued early are more likely to stay. The legal risk is worth the retention benefit.'
+        },
+        'announce_monday_am': {
+          what: 'You announced on Monday morning.',
+          why: 'Monday gives you a full week to manage the narrative, but if rumors leaked over the weekend, employees stewed with no answers. Timing signals how much you respect their need for information.'
+        },
+        'announce_friday_pm': {
+          what: 'You announced Friday afternoon.',
+          why: 'The "Friday news dump" is a classic tactic — but employees know it. It signals fear of their reaction and leaves them with a weekend of anxiety and no one to ask questions.'
+        },
+        'announce_midweek': {
+          what: 'You announced Wednesday morning.',
+          why: 'Wednesday is the "Goldilocks" timing — enough weekdays to address immediate questions, then a weekend to process before the new week begins. It shows respect for employees\' need for both information and processing time.'
+        },
+        'day1_ceo_visit': {
+          what: 'The CEO flew to the target company HQ on Day 1.',
+          why: 'Physical presence signals respect. It says "you matter enough for me to be here." Research shows in-person communication during crises builds significantly more trust than video or written messages.'
+        },
+        'day1_video_only': {
+          what: 'You relied on video message and Q&A for the announcement.',
+          why: 'Video ensures consistent messaging, but employees notice when the CEO doesn\'t show up in person. In mergers, the hierarchy of trust is: in-person > video > email > silence. You chose efficiency over connection.'
+        },
+        'day1_manager_cascade': {
+          what: 'You briefed managers first and had them deliver the message.',
+          why: 'People trust their direct manager more than executives. Manager cascade is personal and builds trust — but 50 managers will deliver 50 slightly different messages, which can fuel rumors.'
+        },
+        'crisis_retention_bonus': {
+          what: 'You offered an emergency retention package.',
+          why: 'Golden handcuffs work short-term but create precedent. If one person gets $500K, others will expect the same. The board will question the budget. But sometimes you have to pay to keep critical talent.'
+        },
+        'crisis_role_clarity': {
+          what: 'You offered clear role definition instead of money.',
+          why: 'Research shows uncertainty is the #1 driver of post-merger attrition, not compensation. Role clarity addresses the root cause. People leave because they don\'t know their future, not because they aren\'t paid enough.'
+        },
+        'crisis_let_go': {
+          what: 'You let a key leader leave rather than fight for them.',
+          why: 'Not everyone can or should be retained. But visible departures early in an integration spike anxiety for everyone who remains. The message is: "This company lets people go." Others will update their LinkedIn profiles.'
+        },
+        'org_announce_now': {
+          what: 'You announced the org structure immediately.',
+          why: 'Research shows merger syndrome peaks in the 2-4 week window of uncertainty. Every day of ambiguity costs productivity and increases attrition risk. Speed creates some losers but ends the paralysis.'
+        },
+        'org_listening_tour': {
+          what: 'You conducted a listening tour before announcing structure.',
+          why: 'Better data leads to better decisions. But employees see prolonged "listening tours" as delay tactics. The key is to set a clear end date and stick to it.'
+        },
+        'org_phased': {
+          what: 'You used a phased announcement approach.',
+          why: 'Phased rollouts seem logical but create tiers of anxiety. People not yet announced assume they\'re being cut. Each phase restarts the rumor cycle.'
+        },
+        'speed_full_throttle': {
+          what: 'You pushed integration at full speed.',
+          why: 'Speed captures value before competitors react and integration fatigue sets in. But speed can outpace organizational readiness, creating change resistance that lasts for years.'
+        },
+        'speed_selective': {
+          what: 'You selectively accelerated systems while slowing people changes.',
+          why: 'Systems can be integrated faster than cultures. This approach captures some value while giving people time to adjust. The risk is mixed messages about priorities.'
+        },
+        'speed_slow': {
+          what: 'You prioritized stabilization over speed.',
+          why: 'Sustainable integration requires organizational readiness. But boards and markets have limited patience for "we\'re taking our time." You traded short-term pressure for long-term health.'
+        },
+        'culture_address_public': {
+          what: 'You addressed a culture incident publicly.',
+          why: 'Public acknowledgment signals that target culture matters. It builds trust with the acquired company but may make acquirer employees feel thrown under the bus. Brave leadership requires taking sides sometimes.'
+        },
+        'culture_private': {
+          what: 'You handled a culture incident quietly.',
+          why: 'Private resolution keeps the conflict contained but doesn\'t address the systemic issue. Rumors will fill the vacuum. Employees will wonder what "really" happened.'
+        },
+        'culture_standards': {
+          what: 'You enforced acquirer standards in a culture conflict.',
+          why: 'Clear signal that acquirer culture wins. This accelerates integration but can devastate target retention. It works in absorption archetypes but fails badly in talent acquisitions.'
+        },
+        'board_double_down': {
+          what: 'You promised accelerated cost synergies to the board.',
+          why: 'Cost synergies are controllable — you can always cut more people. But every layoff increases survivor guilt and flight risk. You may hit your numbers while hollowing out the organization.'
+        },
+        'board_revenue': {
+          what: 'You pivoted to revenue synergies.',
+          why: 'Revenue synergies are harder to achieve but don\'t destroy morale. The board may be skeptical of the longer timeline, but sustainable value creation beats short-term cost extraction.'
+        },
+        'board_honest': {
+          what: 'You told the board the projections were unrealistic.',
+          why: 'Honesty about integration challenges is rare and risky. It may cost you your job. But resetting expectations early is better than explaining failure later. The bravest CPOs tell boards what they need to hear, not what they want to hear.'
+        },
+        'final_celebrate': {
+          what: 'You recommended a major integration milestone celebration.',
+          why: 'Celebration matters. After months of uncertainty and hard work, people need to see that progress is real. Public recognition of cross-company wins builds the "we" identity that makes integration stick.'
+        },
+        'final_address': {
+          what: 'You chose to address remaining cultural gaps.',
+          why: 'Culture work is never "done" — but Year 1 is when patterns solidify. Addressing lingering issues now prevents them from becoming permanent. Ignoring them signals acceptance.'
+        },
+        'final_quiet': {
+          what: 'You recommended moving on without fanfare.',
+          why: 'Sometimes quiet competence beats celebration. The risk is that employees never get closure on the integration phase, and cultural issues persist because they were never explicitly addressed.'
+        }
+      };
+
+      // Format decision history with explanations
+      const decisionHistory = GameState.decisions.map((d, i) => {
+        const explanation = DECISION_EXPLANATIONS[d.card];
+        if (explanation) {
+          return `  ${i + 1}. Day ${d.day}: "${d.cardTitle}"
+     
+     WHAT: ${explanation.what}
+     
+     WHY IT MATTERS: ${explanation.why}
+`;
+        }
+        return `  ${i + 1}. Day ${d.day}: "${d.cardTitle}"`;
+      }).join('\n');
+
+      const formatItems = (items) => {
+        return items.map(item => {
+          const priorityIcon = item.priority === 'critical' ? '🔴' : (item.priority === 'high' ? '🟡' : '⚪');
+          const learnedFlag = item.learned ? ' ◄ This one cost you' : '';
+          return `  ${priorityIcon} ${item.item}${learnedFlag}`;
+        }).join('\n');
+      };
+
+      const formatDimension = (key, value) => {
+        const dg = getDimensionGrade(value);
+        const name = COMPETENCY_DIMENSIONS[key].name;
+        const desc = COMPETENCY_DIMENSIONS[key].description;
+        const bar = '█'.repeat(Math.floor(value / 10)) + '░'.repeat(10 - Math.floor(value / 10));
+        return `  ${name}
+    ${bar} ${dg.grade} (${Math.round(value)}/100)
+    ${desc}`;
+      };
+
+      const content = `
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                                                                               ║
+║              ██████╗ ██╗      █████╗ ██╗   ██╗██████╗  ██████╗  ██████╗ ██╗  ██╗ ║
+║              ██╔══██╗██║     ██╔══██╗╚██╗ ██╔╝██╔══██╗██╔═══██╗██╔═══██╗██║ ██╔╝ ║
+║              ██████╔╝██║     ███████║ ╚████╔╝ ██████╔╝██║   ██║██║   ██║█████╔╝  ║
+║              ██╔═══╝ ██║     ██╔══██║  ╚██╔╝  ██╔══██╗██║   ██║██║   ██║██╔═██╗  ║
+║              ██║     ███████╗██║  ██║   ██║   ██████╔╝╚██████╔╝╚██████╔╝██║  ██╗ ║
+║              ╚═╝     ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚═════╝  ╚═════╝  ╚═════╝ ╚═╝  ╚═╝ ║
+║                                                                               ║
+║                    YOUR PERSONAL M&A INTEGRATION PLAYBOOK                     ║
+║                                                                               ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+Generated from your simulation of: ${scenario.acquirerName} + ${scenario.targetName}
+Date: ${new Date().toLocaleDateString()}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+YOUR FINAL GRADE: ${grade.letterGrade}
+                  (${Math.round(grade.overall)}/100)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+YOUR SCENARIO
+─────────────
+
+  ARCHETYPE: ${archetype.name.toUpperCase()}
+  "${archetype.tagline}"
+  
+  ${archetype.description}
+
+  WIN CONDITION: ${archetype.winCondition}
+  FAILURE MODE: ${archetype.failureMode}
+
+  SCENARIO DETAILS:
+    • Cultural Gap: ${scenario.culturalGap.toUpperCase()}
+    • Target Size: ${scenario.targetSize.toUpperCase()}
+    • Industry: ${scenario.industryContext.toUpperCase()}
+    • Your Role: ${GameState.role.toUpperCase()}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+YOUR COMPETENCY SCORECARD
+─────────────────────────
+
+${Object.entries(grade.dimensions).map(([key, value]) => formatDimension(key, value)).join('\n\n')}
+
+KEY OUTCOMES:
+  • Key Talent Retained: ${grade.retainedCount}/${grade.totalTalent}
+  • Synergy Realized: ${grade.synergy}%
+  • Departed Executives: ${grade.departed}
+
+${grade.strengths.length > 0 ? `
+YOUR STRENGTHS:
+${grade.strengths.map(s => `  ✓ ${s.name} — you demonstrated real skill here`).join('\n')}
+` : ''}
+${grade.weaknesses.length > 0 ? `
+AREAS FOR DEVELOPMENT:
+${grade.weaknesses.map(w => `  ✗ ${w.name} — this needs attention in your next integration`).join('\n')}
+` : ''}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+YOUR DECISION HISTORY
+─────────────────────
+
+${decisionHistory}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+                        ⚠️  BEFORE YOU USE THIS CHECKLIST  ⚠️
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${checklist.criticalWarning}
+
+This playbook captures PRINCIPLES, not procedures. Your merger will be different.
+
+The skill is in reading the room, sensing when the standard playbook doesn't apply,
+and having the courage to deviate when signals change.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+YOUR PERSONALIZED CHECKLIST
+───────────────────────────
+
+Priority Key: 🔴 Critical  🟡 High Priority  ⚪ Standard
+Items marked "◄ This one cost you" are where your simulation struggled.
+
+
+PRE-ANNOUNCEMENT PHASE (Day -30 to Day 0)
+─────────────────────────────────────────
+${formatItems(checklist.preAnnouncement)}
+
+
+ANNOUNCEMENT DAY
+────────────────
+${formatItems(checklist.announcementDay)}
+
+
+FIRST 30 DAYS
+─────────────
+${formatItems(checklist.firstThirtyDays)}
+
+
+INTEGRATION PHASE (Day 31 - Day 100+)
+─────────────────────────────────────
+${formatItems(checklist.integration)}
+
+
+ONGOING (Throughout Year 1 and Beyond)
+──────────────────────────────────────
+${formatItems(checklist.ongoing)}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PERSONALIZED INSIGHTS
+─────────────────────
+
+What your specific playthrough revealed:
+
+${checklist.personalizedInsights.map((item, i) => `
+  ${i + 1}. ${item.insight}
+  
+     Source: ${item.source}
+`).join('\n')}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ARCHETYPE-SPECIFIC ADVICE: ${archetype.name.toUpperCase()}
+${'─'.repeat(archetype.name.length + 25)}
+
+${archetype.strategicAdvice}
+
+${scenario.archetype === 'talent_acquisition' ? `
+TALENT ACQUISITION SPECIAL CONSIDERATIONS:
+  • Golden handcuffs (retention bonuses) are necessary but not sufficient
+  • People stay for autonomy, growth, and feeling valued
+  • Track "engagement" not just "retention" — zombies don't add value
+  • The acquirer's culture is a threat to everything you bought
+` : ''}
+${scenario.archetype === 'merger_of_equals' ? `
+MERGER OF EQUALS SPECIAL CONSIDERATIONS:
+  • Every decision will be interpreted through "who's really winning"
+  • Symbolic gestures matter enormously (office location, who speaks first)
+  • "Fair" processes that produce lopsided outcomes will be rejected
+  • The losing side's narrative can poison the entire integration
+` : ''}
+${scenario.archetype === 'absorption' ? `
+ABSORPTION SPECIAL CONSIDERATIONS:
+  • Speed is a feature, not a bug — prolonged uncertainty is worse
+  • Don't pretend this is something it isn't
+  • Clear communication about "new reality" beats false reassurance
+  • Some talent loss is acceptable if integration momentum is maintained
+` : ''}
+${scenario.archetype === 'rescue' ? `
+RESCUE SPECIAL CONSIDERATIONS:
+  • Employees already know cuts are coming — don't insult their intelligence
+  • Your only asset is honesty about timeline, criteria, and support
+  • Survivors matter more than synergy numbers
+  • Guilt and trauma are contagious — address them directly
+` : ''}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+THE RESEARCH BEHIND THE SIMULATION
+──────────────────────────────────
+
+Key statistics that informed this simulation:
+
+  • 70-90% of M&As fail to achieve their stated objectives
+    Source: KPMG, McKinsey, multiple academic studies
+    
+  • 47% of key employees leave within Year 1; 75% by Year 3
+    Source: EY M&A Integration Survey
+    
+  • 50% of merger failures are attributed to poor communication
+    Source: McKinsey & Company
+    
+  • Companies focused on culture during integration are 50% more 
+    likely to hit synergy targets
+    Source: Deloitte Human Capital M&A Study
+    
+  • The most talented, disengaged employees leave first — they have options
+    Source: Gallup Engagement Research
+    
+  • First-time acquirers succeed 23% of the time; 
+    by the 10th deal, success rate rises to 54%
+    Source: Bain & Company
+    
+  • The "human capital gap" typically equals 10-15% of purchase price
+    Source: Academic M&A research compilation
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                                                                               ║
+║                           FINAL REMINDER                                      ║
+║                                                                               ║
+║   This playbook is a framework, not a formula.                               ║
+║                                                                               ║
+║   Every M&A is different. The timing of your decisions, your ability          ║
+║   to read the room, and your willingness to pivot when signals change —       ║
+║   these matter more than any checklist.                                       ║
+║                                                                               ║
+║   The spreadsheet doesn't capture the human side.                             ║
+║   That's your job.                                                            ║
+║                                                                               ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+───────────────────────────────────────────────────────────────────────────────
+
+                              ABOUT THIS TOOL
+
+"The Integration" was built by Samir Saad, HR Business Partner (SPHR), to help
+HR practitioners, executives, and leaders experience the human side of M&A 
+before they're in the middle of one.
+
+The statistics are real. The scenarios are based on research. The playbook 
+you're holding was generated from YOUR decisions — not a generic template.
+
+Connect: linkedin.com/in/saadsamir
+
+───────────────────────────────────────────────────────────────────────────────
+Generated by "The Integration" — M&A Leadership Simulator
+Your Grade: ${grade.letterGrade} | Archetype: ${archetype.name} | Role: ${GameState.role}
+Based on research from McKinsey, HBR, EY, Gallup, and academic M&A literature
+───────────────────────────────────────────────────────────────────────────────
+`;
+
+      // Download as text file
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const safeArchetype = archetype.name.replace(/[^a-zA-Z]/g, '');
+      const safeGrade = grade.letterGrade.replace('+', 'Plus').replace('-', 'Minus');
+      a.download = `Integration_Playbook_${safeArchetype}_${safeGrade}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // ==================== GAME CONTENT ====================
+    const PHASES = [
+      { name: 'Pre-Announcement', dayRange: [-7, 0] },
+      { name: 'Announcement → Day 30', dayRange: [1, 30] },
+      { name: 'Day 31 → Day 100', dayRange: [31, 100] },
+      { name: 'Day 100 → Month 12', dayRange: [101, 365] }
+    ];
+
+    const SCENES = [
+      // PHASE 0: Pre-Announcement
+      {
+        phase: 0,
+        day: -7,
+        title: 'The Deal is Signed',
+        narrative: `The ink is dry. Nexus Corp has acquired Meridian Technologies for $2.4 billion. The financial models project $180 million in annual synergies. The board is euphoric. The market is watching.<br><br>But the deal isn't public yet. You have seven days before the announcement. Every decision you make now will echo through the next twelve months.`,
+        context: `<strong>Why this matters:</strong> Pre-announcement is your only chance to prepare. Once news breaks, you're in reactive mode. The decisions you make now — who knows, who's prepared, who feels valued — will determine whether Day 1 is controlled chaos or complete chaos.`,
+        cards: [
+          {
+            id: 'pre_brief_small',
+            type: 'Communication',
+            title: 'Keep the Circle Tight',
+            description: 'Only C-suite knows before announcement. Minimize leak risk, but no time to prepare managers.',
+            why: 'Fewer people means less leak risk, but managers will be blindsided and unable to support their teams on Day 1.',
+            effects: [
+              { metric: 'rumors', delta: -10, label: '-10 Rumors' },
+              { metric: 'trustTarget', delta: -5, label: '-5 Target Trust' },
+              { metric: 'mergerSyndrome', delta: +10, label: '+10 Merger Syndrome' }
+            ]
+          },
+          {
+            id: 'pre_brief_vps',
+            type: 'Communication',
+            title: 'Brief the VPs',
+            description: 'Include VP-level leaders from both companies. They can prepare their teams—but more people means more leak risk.',
+            why: 'VPs can cascade information and answer questions on Day 1. But every additional person who knows increases the chance of leaks.',
+            effects: [
+              { metric: 'rumors', delta: +15, label: '+15 Rumors' },
+              { metric: 'trustTarget', delta: +10, label: '+10 Target Trust' },
+              { metric: 'trustAcquirer', delta: +5, label: '+5 Acquirer Trust' }
+            ]
+          },
+          {
+            id: 'pre_brief_key_talent',
+            type: 'Retention',
+            title: 'Quietly Approach Key Talent',
+            description: 'Have confidential conversations with flight-risk A-players before announcement. They feel valued—but legal is nervous.',
+            why: 'Research shows personal outreach before announcements dramatically reduces flight risk. But it\'s legally sensitive and creates expectations.',
+            effects: [
+              { metric: 'boardPressure', delta: +10, label: '+10 Board Pressure' },
+              { special: 'reduce_flight_risk', targets: ['marcus', 'sarah'], amount: 15, label: '-15 Flight Risk (2)' }
+            ]
+          }
+        ]
+      },
+      {
+        phase: 0,
+        day: -3,
+        title: 'Announcement Day Timing',
+        narrative: `Legal has cleared you for announcement. The CEO wants your recommendation on timing. This decision will set the tone for how 4,200 employees first experience this merger.<br><br>Remember: they'll remember where they were when they heard the news.`,
+        context: `<strong>Why this matters:</strong> Announcement timing is a signal. Friday announcements feel like the company is hiding. Monday mornings give people a week of anxiety. There's no perfect answer — only trade-offs.`,
+        cards: [
+          {
+            id: 'announce_monday_am',
+            type: 'Strategy',
+            title: 'Monday 8AM',
+            description: 'Full week ahead to address questions. But employees have all weekend to worry after Friday rumors.',
+            why: 'Monday gives you a full week to manage the narrative, but if rumors leak Friday, employees stew all weekend with no answers.',
+            effects: [
+              { metric: 'mergerSyndrome', delta: +8, label: '+8 Merger Syndrome' },
+              { metric: 'rumors', delta: +5, label: '+5 Rumors' },
+              { metric: 'synergy', delta: +5, label: '+5 Synergy' }
+            ]
+          },
+          {
+            id: 'announce_friday_pm',
+            type: 'Strategy',
+            title: 'Friday 4PM',
+            description: 'Weekend buffer for emotions to settle. But employees feel blindsided with no one to ask questions.',
+            why: 'The "Friday news dump" is a classic tactic — but employees know it. It signals that you\'re afraid of their reaction.',
+            effects: [
+              { metric: 'trustTarget', delta: -12, label: '-12 Target Trust' },
+              { metric: 'mergerSyndrome', delta: +15, label: '+15 Merger Syndrome' },
+              { metric: 'boardPressure', delta: -5, label: '-5 Board Pressure' }
+            ]
+          },
+          {
+            id: 'announce_midweek',
+            type: 'Strategy',
+            title: 'Wednesday Morning',
+            description: 'Balanced approach. Two days for immediate questions, weekend to process.',
+            why: 'Wednesday is the "Goldilocks" timing — enough weekdays to address questions, weekend to process before the new week.',
+            effects: [
+              { metric: 'trustTarget', delta: +5, label: '+5 Target Trust' },
+              { metric: 'trustAcquirer', delta: +3, label: '+3 Acquirer Trust' },
+              { metric: 'mergerSyndrome', delta: -3, label: '-3 Merger Syndrome' }
+            ]
+          }
+        ]
+      },
+      // PHASE 1: Announcement to Day 30
+      {
+        phase: 1,
+        day: 1,
+        title: 'Day One: The Announcement',
+        narrative: `It's done. The press release went out at 6AM. By 7AM, your inbox has 400 unread emails. By 9AM, Glassdoor reviews mentioning "uncertainty" have doubled.<br><br>The Meridian employees are gathered in their cafeteria, watching the CEO's video message. Your move.`,
+        context: `<strong>Why this matters:</strong> Day 1 sets the tone. Employees form their opinion of the merger in the first 48 hours. That opinion is very hard to change later. This is your best chance to shape the narrative.`,
+        cards: [
+          {
+            id: 'day1_ceo_visit',
+            type: 'Leadership',
+            title: 'CEO Flies to Meridian HQ',
+            description: 'Powerful symbol of commitment. But anything said will be parsed for hidden meaning.',
+            why: 'Physical presence signals respect. It says "you matter enough for me to be here." But every word will be analyzed — prepare carefully.',
+            effects: [
+              { metric: 'trustTarget', delta: +15, label: '+15 Target Trust' },
+              { metric: 'boardPressure', delta: +5, label: '+5 Board Pressure' },
+              { metric: 'culturalFriction', delta: -5, label: '-5 Cultural Friction' }
+            ]
+          },
+          {
+            id: 'day1_video_only',
+            type: 'Communication',
+            title: 'Video Message + Q&A',
+            description: 'Efficient and consistent messaging. But feels impersonal to people whose lives are changing.',
+            why: 'Video ensures consistent messaging, but employees will notice the CEO didn\'t show up. In person > video > email > silence.',
+            effects: [
+              { metric: 'trustTarget', delta: -5, label: '-5 Target Trust' },
+              { metric: 'synergy', delta: +8, label: '+8 Synergy' },
+              { metric: 'mergerSyndrome', delta: +10, label: '+10 Merger Syndrome' }
+            ]
+          },
+          {
+            id: 'day1_manager_cascade',
+            type: 'Communication',
+            title: 'Manager Cascade Briefing',
+            description: 'You brief managers first. They deliver the message to their teams. Personal, but message may drift.',
+            why: 'People trust their direct manager more than executives. But 50 managers will deliver 50 slightly different messages.',
+            effects: [
+              { metric: 'trustTarget', delta: +8, label: '+8 Target Trust' },
+              { metric: 'trustAcquirer', delta: +5, label: '+5 Acquirer Trust' },
+              { metric: 'rumors', delta: +10, label: '+10 Rumors' }
+            ]
+          }
+        ]
+      },
+      {
+        phase: 1,
+        day: 7,
+        title: 'The First Crisis',
+        narrative: `A recruiter from your biggest competitor has been spotted in Meridian's parking lot. Word spreads fast. Your flight-risk dashboard is lighting up.<br><br>Marcus Rodriguez (CTO) hasn't returned your calls in 48 hours.`,
+        context: `<strong>Why this matters:</strong> Your response to the first flight risk sets the precedent. If you throw money at Marcus, everyone else will expect the same. If you let him go, others may follow. There's no private decision here — everyone is watching.`,
+        event: {
+          type: 'alert',
+          text: 'FLIGHT RISK ALERT: Marcus Rodriguez (CTO) missed two check-ins. LinkedIn shows he updated his profile yesterday. His departure would trigger a cascade—three of his direct reports have already said they\'d follow him.'
+        },
+        cards: [
+          {
+            id: 'crisis_retention_bonus',
+            type: 'Retention',
+            title: 'Emergency Retention Package',
+            description: 'Offer Marcus a $500K retention bonus with 2-year cliff. Expensive, and other leaders will expect the same.',
+            why: 'Golden handcuffs work short-term but create precedent. If Marcus gets $500K, why not Sarah? Why not James? The board will ask questions.',
+            effects: [
+              { special: 'reduce_flight_risk', targets: ['marcus'], amount: 30, label: '-30 Flight Risk (Marcus)' },
+              { metric: 'boardPressure', delta: +15, label: '+15 Board Pressure' },
+              { special: 'increase_flight_risk', targets: ['sarah', 'james'], amount: 10, label: '+10 Flight Risk (Others)' }
+            ]
+          },
+          {
+            id: 'crisis_role_clarity',
+            type: 'Leadership',
+            title: 'Offer Clear Role Definition',
+            description: 'Give Marcus written commitment on his role, scope, and reporting structure. Costs nothing—but locks you into decisions.',
+            why: 'Research shows uncertainty is the #1 driver of post-merger attrition. Role clarity addresses the root cause, not just the symptom.',
+            effects: [
+              { special: 'reduce_flight_risk', targets: ['marcus'], amount: 20, label: '-20 Flight Risk (Marcus)' },
+              { metric: 'synergy', delta: -10, label: '-10 Synergy' },
+              { metric: 'trustTarget', delta: +10, label: '+10 Target Trust' }
+            ]
+          },
+          {
+            id: 'crisis_let_go',
+            type: 'Strategy',
+            title: 'Let Him Go',
+            description: 'Some departures are inevitable. Save your political capital and budget for those who want to stay.',
+            why: 'Not everyone can or should be retained. But visible departures early in an integration spike anxiety for everyone who remains.',
+            effects: [
+              { special: 'departure', targets: ['marcus'], label: 'Marcus Departs' },
+              { metric: 'retention', delta: -20, label: '-20 Retention' },
+              { metric: 'boardPressure', delta: +10, label: '+10 Board Pressure' },
+              { metric: 'mergerSyndrome', delta: +20, label: '+20 Merger Syndrome' }
+            ]
+          }
+        ]
+      },
+      {
+        phase: 1,
+        day: 21,
+        title: 'Org Structure Pressure',
+        narrative: `Three weeks in. The board wants to see the new org chart. Employees are desperate for clarity. But every name you put on paper creates winners and losers.<br><br>The CEO asks: "When can we announce the leadership structure?"`,
+        context: `<strong>Why this matters:</strong> Uncertainty is toxic. Every day without an org chart is a day of paralysis, politics, and paranoia. But rushed decisions create resentment that lasts years. The research says: announce within 30 days if possible.`,
+        cards: [
+          {
+            id: 'org_announce_now',
+            type: 'Strategy',
+            title: 'Announce This Week',
+            description: 'End the uncertainty immediately. Some decisions will be rushed, but paralysis is worse.',
+            effects: [
+              { metric: 'mergerSyndrome', delta: -25, label: '-25 Merger Syndrome' },
+              { metric: 'boardPressure', delta: -15, label: '-15 Board Pressure' },
+              { metric: 'culturalFriction', delta: +15, label: '+15 Cultural Friction' },
+              { metric: 'trustTarget', delta: -10, label: '-10 Target Trust' }
+            ]
+          },
+          {
+            id: 'org_listening_tour',
+            type: 'Communication',
+            title: '"Listening Tour" First',
+            description: 'Take two more weeks to interview key leaders from both sides. Better decisions, but more anxiety.',
+            effects: [
+              { metric: 'mergerSyndrome', delta: +12, label: '+12 Merger Syndrome' },
+              { metric: 'culturalFriction', delta: -10, label: '-10 Cultural Friction' },
+              { metric: 'trustTarget', delta: +15, label: '+15 Target Trust' },
+              { metric: 'boardPressure', delta: +10, label: '+10 Board Pressure' }
+            ]
+          },
+          {
+            id: 'org_phased',
+            type: 'Strategy',
+            title: 'Phased Announcements',
+            description: 'Announce C-suite now, VPs in two weeks, directors later. Structured but prolonged uncertainty.',
+            effects: [
+              { metric: 'mergerSyndrome', delta: -5, label: '-5 Merger Syndrome' },
+              { metric: 'boardPressure', delta: -5, label: '-5 Board Pressure' },
+              { metric: 'rumors', delta: +15, label: '+15 Rumors' }
+            ]
+          }
+        ]
+      },
+      // PHASE 2: Day 31-100
+      {
+        phase: 2,
+        day: 45,
+        title: 'Integration Speed',
+        narrative: `The honeymoon is over. The CEO wants to see "quick wins." Finance is asking why synergies aren't materializing faster. Meanwhile, Meridian employees are calling the new approval processes "bureaucratic hell."<br><br>The integration lead asks: how fast should we push?`,
+        cards: [
+          {
+            id: 'speed_full_throttle',
+            type: 'Strategy',
+            title: 'Full Speed Ahead',
+            description: 'Accelerate all workstreams. Hit the 100-day targets. Break a few eggs.',
+            effects: [
+              { metric: 'synergy', delta: +25, label: '+25 Synergy' },
+              { metric: 'boardPressure', delta: -20, label: '-20 Board Pressure' },
+              { metric: 'mergerSyndrome', delta: +30, label: '+30 Merger Syndrome' },
+              { metric: 'culturalFriction', delta: +20, label: '+20 Cultural Friction' },
+              { special: 'increase_flight_risk', targets: ['sarah', 'james', 'elena'], amount: 15, label: '+15 Flight Risk (All)' }
+            ]
+          },
+          {
+            id: 'speed_selective',
+            type: 'Strategy',
+            title: 'Selective Acceleration',
+            description: 'Push hard on systems integration, go slow on people changes. Mixed messages but balanced risk.',
+            effects: [
+              { metric: 'synergy', delta: +10, label: '+10 Synergy' },
+              { metric: 'boardPressure', delta: +5, label: '+5 Board Pressure' },
+              { metric: 'culturalFriction', delta: +5, label: '+5 Cultural Friction' },
+              { metric: 'mergerSyndrome', delta: +5, label: '+5 Merger Syndrome' }
+            ]
+          },
+          {
+            id: 'speed_slow',
+            type: 'Leadership',
+            title: 'Prioritize Stabilization',
+            description: 'Slow down. Let people adjust. The synergies will come when the organization is ready.',
+            effects: [
+              { metric: 'synergy', delta: -5, label: '-5 Synergy' },
+              { metric: 'boardPressure', delta: +25, label: '+25 Board Pressure' },
+              { metric: 'mergerSyndrome', delta: -15, label: '-15 Merger Syndrome' },
+              { metric: 'trustTarget', delta: +15, label: '+15 Target Trust' },
+              { special: 'reduce_flight_risk', targets: ['sarah', 'james', 'elena'], amount: 10, label: '-10 Flight Risk (All)' }
+            ]
+          }
+        ]
+      },
+      {
+        phase: 2,
+        day: 75,
+        title: 'Culture Collision',
+        narrative: `An incident. A Nexus director publicly overrode a Meridian team's decision in a meeting, citing "proper governance." The Meridian employees walked out. It's all over Slack.<br><br>This is the moment the cultural integration either heals or fractures.`,
+        event: {
+          type: 'alert',
+          text: 'CULTURE INCIDENT: 14 Meridian employees have signed a letter to the CEO calling the incident "emblematic of how we\'re being treated." Three are on your key talent list.'
+        },
+        cards: [
+          {
+            id: 'culture_address_public',
+            type: 'Leadership',
+            title: 'Address It Publicly',
+            description: 'CEO sends company-wide message acknowledging the incident. Names no names but commits to respect.',
+            effects: [
+              { metric: 'trustTarget', delta: +20, label: '+20 Target Trust' },
+              { metric: 'culturalFriction', delta: -15, label: '-15 Cultural Friction' },
+              { metric: 'trustAcquirer', delta: -10, label: '-10 Acquirer Trust' },
+              { metric: 'mergerSyndrome', delta: -10, label: '-10 Merger Syndrome' }
+            ]
+          },
+          {
+            id: 'culture_private',
+            type: 'Communication',
+            title: 'Handle It Quietly',
+            description: 'Meet privately with the letter signers. Discipline the Nexus director behind closed doors.',
+            effects: [
+              { metric: 'trustTarget', delta: +10, label: '+10 Target Trust' },
+              { metric: 'culturalFriction', delta: -5, label: '-5 Cultural Friction' },
+              { metric: 'rumors', delta: +15, label: '+15 Rumors' }
+            ]
+          },
+          {
+            id: 'culture_standards',
+            type: 'Strategy',
+            title: 'Enforce Nexus Standards',
+            description: 'The director followed proper process. Back them up. Meridian needs to adapt.',
+            effects: [
+              { metric: 'trustTarget', delta: -25, label: '-25 Target Trust' },
+              { metric: 'trustAcquirer', delta: +15, label: '+15 Acquirer Trust' },
+              { metric: 'culturalFriction', delta: +25, label: '+25 Cultural Friction' },
+              { metric: 'synergy', delta: +10, label: '+10 Synergy' },
+              { special: 'increase_flight_risk', targets: ['sarah', 'james', 'elena'], amount: 20, label: '+20 Flight Risk (3)' }
+            ]
+          }
+        ]
+      },
+      // PHASE 3: Day 100+
+      {
+        phase: 3,
+        day: 120,
+        title: 'The Board Review',
+        narrative: `Day 120. The board wants answers. Synergy realization is at ${GameState.metrics.synergy}% of target. Three key executives have departed. The stock is flat.<br><br>"What's your plan for the next six months?"`,
+        cards: [
+          {
+            id: 'board_double_down',
+            type: 'Strategy',
+            title: 'Accelerate Cost Synergies',
+            description: 'Promise aggressive headcount reduction. The numbers will work. The humans... less certain.',
+            effects: [
+              { metric: 'synergy', delta: +30, label: '+30 Synergy' },
+              { metric: 'boardPressure', delta: -30, label: '-30 Board Pressure' },
+              { metric: 'mergerSyndrome', delta: +35, label: '+35 Merger Syndrome' },
+              { metric: 'retention', delta: -15, label: '-15 Retention' },
+              { special: 'increase_flight_risk', targets: ['sarah', 'james', 'elena', 'david'], amount: 25, label: '+25 Flight Risk (All)' }
+            ]
+          },
+          {
+            id: 'board_revenue',
+            type: 'Strategy',
+            title: 'Pivot to Revenue Synergies',
+            description: 'Shift focus from cost cuts to cross-selling opportunities. Longer timeline, but sustainable.',
+            effects: [
+              { metric: 'synergy', delta: +15, label: '+15 Synergy' },
+              { metric: 'boardPressure', delta: +10, label: '+10 Board Pressure' },
+              { metric: 'trustTarget', delta: +15, label: '+15 Target Trust' },
+              { metric: 'trustAcquirer', delta: +10, label: '+10 Acquirer Trust' }
+            ]
+          },
+          {
+            id: 'board_honest',
+            type: 'Leadership',
+            title: 'Reset Expectations',
+            description: 'Tell the board the truth: original synergy targets were unrealistic. Risk your credibility to save the integration.',
+            effects: [
+              { metric: 'boardPressure', delta: +30, label: '+30 Board Pressure' },
+              { metric: 'trustTarget', delta: +20, label: '+20 Target Trust' },
+              { metric: 'trustAcquirer', delta: +15, label: '+15 Acquirer Trust' },
+              { metric: 'mergerSyndrome', delta: -20, label: '-20 Merger Syndrome' }
+            ]
+          }
+        ]
+      },
+      {
+        phase: 3,
+        day: 270,
+        title: 'Nine Months In',
+        narrative: `The dust is settling. Some employees have left. Some have stayed. The cultures are... coexisting, if not merging. The question now is legacy.<br><br>What will this integration be remembered for?`,
+        cards: [
+          {
+            id: 'legacy_celebrate',
+            type: 'Communication',
+            title: 'Celebrate the Wins',
+            description: 'Host integration anniversary events. Share success stories. Build the "we did it together" narrative.',
+            effects: [
+              { metric: 'mergerSyndrome', delta: -20, label: '-20 Merger Syndrome' },
+              { metric: 'trustTarget', delta: +10, label: '+10 Target Trust' },
+              { metric: 'trustAcquirer', delta: +10, label: '+10 Acquirer Trust' },
+              { metric: 'culturalFriction', delta: -10, label: '-10 Cultural Friction' }
+            ]
+          },
+          {
+            id: 'legacy_push',
+            type: 'Strategy',
+            title: 'Push for Final Synergies',
+            description: 'One last efficiency wave before Year 1 close. Hit those numbers.',
+            effects: [
+              { metric: 'synergy', delta: +20, label: '+20 Synergy' },
+              { metric: 'boardPressure', delta: -20, label: '-20 Board Pressure' },
+              { metric: 'mergerSyndrome', delta: +15, label: '+15 Merger Syndrome' },
+              { metric: 'retention', delta: -10, label: '-10 Retention' }
+            ]
+          },
+          {
+            id: 'legacy_culture',
+            type: 'Leadership',
+            title: 'Invest in Culture Building',
+            description: 'Launch formal culture integration program. Mixed teams, shared values workshops, long-term commitment.',
+            effects: [
+              { metric: 'culturalFriction', delta: -25, label: '-25 Cultural Friction' },
+              { metric: 'trustTarget', delta: +15, label: '+15 Target Trust' },
+              { metric: 'synergy', delta: -5, label: '-5 Synergy' },
+              { metric: 'boardPressure', delta: +10, label: '+10 Board Pressure' }
+            ]
+          }
+        ]
+      }
+    ];
+
+    // ==================== UI FUNCTIONS ====================
+    function updateMetricDisplay(metricId, value, barId) {
+      const valueEl = document.getElementById(metricId);
+      const barEl = document.getElementById(barId);
+      
+      value = Math.max(0, Math.min(100, value));
+      
+      valueEl.textContent = `${Math.round(value)}%`;
+      barEl.style.width = `${value}%`;
+      
+      // Update color classes
+      let colorClass = 'good';
+      
+      // Different metrics have different "good" directions
+      const lowerIsBetter = ['mergerSyndrome', 'culturalFriction', 'rumors', 'boardPressure'];
+      const isLowerBetter = lowerIsBetter.some(m => metricId.includes(m.toLowerCase().replace(/([A-Z])/g, '-$1')));
+      
+      if (metricId.includes('merger-syndrome') || metricId.includes('cultural-friction') || 
+          metricId.includes('rumors') || metricId.includes('board-pressure')) {
+        // Lower is better
+        if (value > 60) colorClass = 'danger';
+        else if (value > 40) colorClass = 'warning';
+        else colorClass = 'good';
+      } else {
+        // Higher is better
+        if (value < 30) colorClass = 'danger';
+        else if (value < 50) colorClass = 'warning';
+        else colorClass = 'good';
+      }
+      
+      valueEl.className = `metric-value ${colorClass}`;
+      barEl.className = `metric-bar-fill ${colorClass}`;
+    }
+
+    function updateAllMetrics() {
+      updateMetricDisplay('trust-acquirer', GameState.metrics.trustAcquirer, 'trust-acquirer-bar');
+      updateMetricDisplay('trust-target', GameState.metrics.trustTarget, 'trust-target-bar');
+      updateMetricDisplay('merger-syndrome', GameState.metrics.mergerSyndrome, 'merger-syndrome-bar');
+      updateMetricDisplay('cultural-friction', GameState.metrics.culturalFriction, 'cultural-friction-bar');
+      updateMetricDisplay('rumors', GameState.metrics.rumors, 'rumors-bar');
+      updateMetricDisplay('board-pressure', GameState.metrics.boardPressure, 'board-pressure-bar');
+      updateMetricDisplay('synergy', GameState.metrics.synergy, 'synergy-bar');
+      updateMetricDisplay('retention', GameState.metrics.retention, 'retention-bar');
+    }
+
+    function updateFlightRiskDisplay() {
+      const container = document.getElementById('flight-risk-list');
+      container.innerHTML = '';
+      
+      const activeTalent = GameState.keyTalent.filter(t => !t.departed);
+      
+      activeTalent.forEach(person => {
+        const levelClass = person.flightRisk >= 70 ? 'high' : (person.flightRisk >= 50 ? 'medium' : '');
+        const div = document.createElement('div');
+        div.className = 'flight-risk-person';
+        div.innerHTML = `
+          <div class="flight-risk-avatar">${person.initials}</div>
+          <div class="flight-risk-info">
+            <div class="flight-risk-name">${person.name}</div>
+            <div class="flight-risk-role">${person.role}</div>
+          </div>
+          <div class="flight-risk-level ${levelClass}">${Math.round(person.flightRisk)}%</div>
+        `;
+        container.appendChild(div);
+      });
+
+      // Show departed
+      const departed = GameState.keyTalent.filter(t => t.departed);
+      departed.forEach(person => {
+        const div = document.createElement('div');
+        div.className = 'flight-risk-person';
+        div.style.opacity = '0.5';
+        div.innerHTML = `
+          <div class="flight-risk-avatar" style="background: var(--accent-red);">${person.initials}</div>
+          <div class="flight-risk-info">
+            <div class="flight-risk-name">${person.name}</div>
+            <div class="flight-risk-role" style="color: var(--accent-red);">DEPARTED</div>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function addIntelItem(type, text, day) {
+      const container = document.getElementById('intel-feed');
+      const item = document.createElement('div');
+      item.className = `intel-item ${type === 'alert' ? 'alert' : (type === 'warning' ? 'warning' : '')}`;
+      item.innerHTML = `
+        <div class="intel-item-header">
+          <span class="intel-item-type">${type}</span>
+          <span class="intel-item-day">Day ${day}</span>
+        </div>
+        <div class="intel-item-text">${text}</div>
+      `;
+      container.insertBefore(item, container.firstChild);
+    }
+
+    function updatePhaseDisplay() {
+      const phase = GameState.currentPhase;
+      const dots = document.querySelectorAll('.phase-dot');
+      
+      dots.forEach((dot, i) => {
+        dot.classList.remove('active', 'complete');
+        if (i < phase) dot.classList.add('complete');
+        if (i === phase) dot.classList.add('active');
+      });
+      
+      document.getElementById('phase-label').textContent = PHASES[phase].name;
+    }
+
+    function renderScene(scene) {
+      GameState.day = scene.day;
+      document.getElementById('game-day').textContent = `Day ${scene.day}`;
+      document.getElementById('scene-phase').textContent = `Phase ${scene.phase}: ${PHASES[scene.phase].name}`;
+      document.getElementById('scene-title').textContent = scene.title;
+      document.getElementById('scene-narrative').innerHTML = scene.narrative;
+      
+      // Clear previous event
+      document.getElementById('event-container').innerHTML = '';
+      
+      // Show event if present
+      if (scene.event) {
+        const eventDiv = document.createElement('div');
+        eventDiv.className = `event-popup ${scene.event.type === 'positive' ? 'positive' : ''}`;
+        eventDiv.innerHTML = `
+          <div class="event-label">${scene.event.type === 'alert' ? '⚠ ALERT' : 'EVENT'}</div>
+          <div class="event-text">${scene.event.text}</div>
+        `;
+        document.getElementById('event-container').appendChild(eventDiv);
+      }
+      
+      // Render cards
+      renderCards(scene.cards);
+      
+      // Update phase
+      if (scene.phase !== GameState.currentPhase) {
+        GameState.currentPhase = scene.phase;
+        updatePhaseDisplay();
+      }
+    }
+
+    function renderCards(cards) {
+      const hand = document.getElementById('card-hand');
+      hand.innerHTML = '';
+      
+      cards.forEach(card => {
+        const cardEl = document.createElement('div');
+        cardEl.className = 'decision-card';
+        cardEl.dataset.cardId = card.id;
+        
+        const effectsHtml = card.effects.map(eff => {
+          let label = eff.label;
+          let cls = 'neutral';
+          
+          // Determine positive/negative based on metric type
+          if (eff.metric) {
+            const lowerIsBetter = ['mergerSyndrome', 'culturalFriction', 'rumors', 'boardPressure'];
+            if (lowerIsBetter.includes(eff.metric)) {
+              cls = eff.delta < 0 ? 'positive' : 'negative';
+            } else {
+              cls = eff.delta > 0 ? 'positive' : 'negative';
+            }
+          } else if (eff.special === 'reduce_flight_risk') {
+            cls = 'positive';
+          } else if (eff.special === 'increase_flight_risk' || eff.special === 'departure') {
+            cls = 'negative';
+          }
+          
+          return `<span class="card-effect ${cls}">${label}</span>`;
+        }).join('');
+        
+        cardEl.innerHTML = `
+          <div class="card-type">${card.type}</div>
+          <div class="card-title">${card.title}</div>
+          <div class="card-description">${card.description}</div>
+          <div class="card-effects">${effectsHtml}</div>
+        `;
+        
+        cardEl.addEventListener('click', () => selectCard(card.id));
+        hand.appendChild(cardEl);
+      });
+      
+      document.getElementById('play-card-btn').classList.remove('active');
+    }
+
+    let selectedCardId = null;
+
+    function selectCard(cardId) {
+      selectedCardId = cardId;
+      
+      document.querySelectorAll('.decision-card').forEach(card => {
+        card.classList.toggle('selected', card.dataset.cardId === cardId);
+      });
+      
+      document.getElementById('play-card-btn').classList.add('active');
+    }
+
+    function playSelectedCard() {
+      if (!selectedCardId) return;
+      
+      const scene = GameState.activeCrisisScene || SCENES[GameState.currentSceneIndex];
+      const card = scene.cards.find(c => c.id === selectedCardId);
+      
+      if (!card) return;
+      
+      // Track dimension scores based on card type and effects
+      // Increased bonuses to make choices more impactful
+      if (card.type === 'Communication') {
+        GameState.scores.communicationTiming += 12;
+        GameState.scores.adaptability += 3;
+      }
+      if (card.type === 'Retention') {
+        GameState.scores.retentionStrategy += 15;
+        GameState.scores.stakeholderManagement += 3;
+      }
+      if (card.type === 'Leadership') {
+        GameState.scores.culturalSensitivity += 8;
+        GameState.scores.stakeholderManagement += 10;
+        GameState.scores.adaptability += 5;
+      }
+      if (card.type === 'Strategy') {
+        GameState.scores.decisionSpeed += 12;
+        GameState.scores.adaptability += 5;
+      }
+
+      // Specific card bonuses for particularly good choices
+      if (card.id.includes('brief_vps') || card.id.includes('manager_cascade')) {
+        GameState.scores.communicationTiming += 8;
+      }
+      if (card.id.includes('ceo_visit') || card.id.includes('ceo_call')) {
+        GameState.scores.stakeholderManagement += 10;
+        GameState.scores.culturalSensitivity += 5;
+      }
+      if (card.id.includes('midweek') || card.id.includes('listening_tour')) {
+        GameState.scores.culturalSensitivity += 8;
+      }
+      if (card.id.includes('role_clarity') || card.id.includes('accelerate_role')) {
+        GameState.scores.retentionStrategy += 10;
+      }
+      if (card.id.includes('acknowledge') || card.id.includes('interview')) {
+        GameState.scores.communicationTiming += 8;
+        GameState.scores.adaptability += 5;
+      }
+      if (card.id.includes('celebrate')) {
+        GameState.scores.culturalSensitivity += 10;
+        GameState.scores.stakeholderManagement += 5;
+      }
+      if (card.id.includes('pause') || card.id.includes('compromise')) {
+        GameState.scores.culturalSensitivity += 12;
+        GameState.scores.adaptability += 8;
+      }
+
+      // Penalize certain choices (but not too harshly)
+      if (card.id.includes('let_go') || card.id.includes('departure') || card.id.includes('ignore')) {
+        GameState.scores.retentionStrategy -= 10;
+      }
+      if (card.id.includes('friday_pm') || card.id.includes('video_only') || card.id.includes('silence') || card.id.includes('decline')) {
+        GameState.scores.communicationTiming -= 8;
+      }
+      if (card.id.includes('standards') || card.id.includes('full_throttle') || card.id.includes('override') || card.id.includes('accelerate_cost')) {
+        GameState.scores.culturalSensitivity -= 10;
+      }
+      if (card.id.includes('board_accelerate')) {
+        GameState.scores.stakeholderManagement += 5;
+        GameState.scores.culturalSensitivity -= 12;
+        GameState.scores.retentionStrategy -= 8;
+      }
+      
+      // Apply effects
+      card.effects.forEach(effect => {
+        if (effect.metric) {
+          GameState.metrics[effect.metric] += effect.delta;
+          GameState.metrics[effect.metric] = Math.max(0, Math.min(100, GameState.metrics[effect.metric]));
+        } else if (effect.special === 'reduce_flight_risk') {
+          const targets = effect.targets === 'all' ? GameState.keyTalent.filter(t => !t.departed) :
+                          effect.targets === 'all_target' ? GameState.keyTalent.filter(t => t.isTarget && !t.departed) :
+                          effect.targets.map(id => GameState.keyTalent.find(t => t.id === id)).filter(Boolean);
+          targets.forEach(person => {
+            if (person && !person.departed) {
+              person.flightRisk = Math.max(0, person.flightRisk - effect.amount);
+            }
+          });
+        } else if (effect.special === 'increase_flight_risk') {
+          const targets = effect.targets === 'all' ? GameState.keyTalent.filter(t => !t.departed) :
+                          effect.targets === 'all_target' ? GameState.keyTalent.filter(t => t.isTarget && !t.departed) :
+                          effect.targets.map(id => GameState.keyTalent.find(t => t.id === id)).filter(Boolean);
+          targets.forEach(person => {
+            if (person && !person.departed) {
+              person.flightRisk = Math.min(100, person.flightRisk + effect.amount);
+            }
+          });
+        } else if (effect.special === 'departure') {
+          effect.targets.forEach(targetId => {
+            const person = GameState.keyTalent.find(t => t.id === targetId);
+            if (person) {
+              person.departed = true;
+              addIntelItem('alert', `${person.name} has resigned, effective immediately.`, GameState.day);
+            }
+          });
+        } else if (effect.special === 'random_departure') {
+          // Pick a random high-risk non-departed person
+          const highRisk = GameState.keyTalent.filter(t => !t.departed && t.flightRisk > 60);
+          if (highRisk.length > 0) {
+            const victim = highRisk[Math.floor(Math.random() * highRisk.length)];
+            victim.departed = true;
+            addIntelItem('alert', `${victim.name} has resigned and is joining a competitor.`, GameState.day);
+          }
+        }
+      });
+      
+      // Random flight risk departures check
+      GameState.keyTalent.forEach(person => {
+        if (!person.departed && person.flightRisk > 85 && Math.random() < 0.4) {
+          person.departed = true;
+          GameState.metrics.retention -= 15;
+          GameState.scores.retentionStrategy -= 10;
+          addIntelItem('alert', `${person.name} accepted an offer from a competitor and is leaving.`, GameState.day);
+        }
+      });
+      
+      // Record decision
+      GameState.decisions.push({
+        scene: scene.title,
+        card: card.id,
+        cardTitle: card.title,
+        day: GameState.day
+      });
+      
+      // Add intel
+      addIntelItem('decision', `You chose: "${card.title}"`, GameState.day);
+      
+      // Update displays
+      updateAllMetrics();
+      updateFlightRiskDisplay();
+      
+      // Clear crisis scene if we were handling one
+      GameState.activeCrisisScene = null;
+      
+      // Check for crisis events BEFORE moving to next scene
+      const crisis = checkCrisisEvents();
+      
+      if (crisis) {
+        // Insert crisis as an interruption
+        setTimeout(() => {
+          renderCrisisScene(crisis);
+        }, 500);
+      } else {
+        // Next regular scene
+        GameState.currentSceneIndex++;
+        selectedCardId = null;
+        
+        if (GameState.currentSceneIndex >= SCENES.length) {
+          showResults();
+        } else {
+          setTimeout(() => {
+            // Check for crisis again at scene transition
+            const transitionCrisis = checkCrisisEvents();
+            if (transitionCrisis) {
+              renderCrisisScene(transitionCrisis);
+            } else {
+              renderScene(SCENES[GameState.currentSceneIndex]);
+            }
+          }, 500);
+        }
+      }
+    }
+
+    function renderCrisisScene(crisis) {
+      // Store the crisis as the active scene
+      GameState.activeCrisisScene = {
+        phase: GameState.currentPhase,
+        day: GameState.day,
+        title: crisis.name,
+        narrative: `<strong>UNEXPECTED EVENT</strong><br><br>This wasn't in the plan.`,
+        event: crisis.event,
+        cards: crisis.cards
+      };
+      
+      // Add to intel
+      addIntelItem(crisis.event.type, crisis.event.text, GameState.day);
+      
+      // Render it like a normal scene
+      document.getElementById('scene-phase').textContent = `CRISIS: ${PHASES[GameState.currentPhase].name}`;
+      document.getElementById('scene-title').textContent = crisis.name;
+      document.getElementById('scene-narrative').innerHTML = `<strong style="color: var(--accent-red);">UNEXPECTED EVENT</strong><br><br>This wasn't in your integration plan. How you respond will shape everything that follows.`;
+      
+      // Show event
+      const eventDiv = document.createElement('div');
+      eventDiv.className = `event-popup ${crisis.event.type === 'positive' ? 'positive' : ''}`;
+      eventDiv.innerHTML = `
+        <div class="event-label">${crisis.event.type === 'positive' ? '✨ OPPORTUNITY' : '⚠ CRISIS'}</div>
+        <div class="event-text">${crisis.event.text}</div>
+      `;
+      document.getElementById('event-container').innerHTML = '';
+      document.getElementById('event-container').appendChild(eventDiv);
+      
+      // Render crisis cards
+      renderCards(crisis.cards);
+      
+      selectedCardId = null;
+    }
+
+    function showResults() {
+      document.getElementById('game-screen').style.display = 'none';
+      document.getElementById('result-screen').style.display = 'block';
+      
+      // Calculate grade
+      const grade = calculateGrade();
+      const m = GameState.metrics;
+      const scenario = GameState.scenario;
+      const archetype = ARCHETYPES[scenario.archetype];
+      
+      let badge, title, narrative, careerOutcome;
+      
+      if (grade.overall >= 80) {
+        badge = 'success';
+        title = 'Integration Success';
+        narrative = `Against the odds, you navigated "${archetype.name}" successfully. ${archetype.winCondition} You achieved it. This is what the 25% of successful M&As look like.`;
+        careerOutcome = `You've been promoted to Chief People Officer of the combined entity. The CEO cites your "steady hand through turbulence" in the announcement. Headhunters are calling—but you're not answering.`;
+      } else if (grade.overall >= 60) {
+        badge = 'partial';
+        title = 'Partial Success';
+        narrative = `The integration delivered... some of what was promised. ${grade.departed > 0 ? `The loss of ${grade.departed} key leader${grade.departed > 1 ? 's' : ''} hurt.` : ''} ${archetype.failureMode.split('.')[0]}—but you contained it. Synergies are coming, just slower than projected.`;
+        careerOutcome = `You remain in your role. The CEO privately thanks you for "keeping the wheels on" but the board has questions. Your next performance review will be closely watched.`;
+      } else {
+        badge = 'failure';
+        title = 'Integration Failure';
+        narrative = `${archetype.failureMode} The spreadsheet projected synergies. The reality is a demoralized workforce, ${grade.departed} departed leaders, and an integration that became a case study in what not to do.`;
+        careerOutcome = `Six months after Year 1 close, you're offered a "transition package." The official story is "pursuing other opportunities." The real story: you became the scapegoat for promises the deal could never keep.`;
+      }
+      
+      document.getElementById('result-badge').textContent = `Grade: ${grade.letterGrade}`;
+      document.getElementById('result-badge').className = `result-badge ${badge}`;
+      document.getElementById('result-title').textContent = title;
+      document.getElementById('result-narrative').textContent = narrative;
+      document.getElementById('career-outcome').textContent = careerOutcome;
+      
+      // Populate grade breakdown with explanations
+      const synergyExplanation = grade.synergy >= 50 
+        ? 'Strong — you hit the financial targets the board expected'
+        : grade.synergy >= 30 
+          ? 'Partial — synergies are coming, but slower than projected'
+          : grade.synergy >= 15
+            ? 'Weak — the deal economics are in question'
+            : 'Critical — the financial rationale for this deal has collapsed';
+      
+      const retentionExplanation = grade.departed === 0
+        ? 'Perfect — every key leader stayed. This is rare.'
+        : grade.departed === 1
+          ? `One departure — manageable, but ${GameState.keyTalent.find(t => t.departed)?.name || 'they'} took institutional knowledge with them`
+          : grade.departed === 2
+            ? 'Two departures — you\'re losing critical expertise. Competitors are benefiting.'
+            : `${grade.departed} departures — this is a talent exodus. The deal\'s value is walking out the door.`;
+
+      const metricsContainer = document.getElementById('result-metrics');
+      metricsContainer.innerHTML = `
+        <div class="result-metric">
+          <div class="result-metric-value" style="font-size: 4rem; color: ${badge === 'success' ? 'var(--accent-emerald)' : (badge === 'partial' ? 'var(--accent-amber)' : 'var(--accent-red)')}">${grade.letterGrade}</div>
+          <div class="result-metric-label">Overall Grade</div>
+        </div>
+        <div class="result-metric">
+          <div class="result-metric-value ${grade.synergy >= 50 ? 'good' : (grade.synergy >= 30 ? 'warning' : 'bad')}">${Math.round(grade.synergy)}%</div>
+          <div class="result-metric-label">Synergy Realized</div>
+          <div class="result-metric-explanation">${synergyExplanation}</div>
+        </div>
+        <div class="result-metric">
+          <div class="result-metric-value ${grade.departed === 0 ? 'good' : (grade.departed <= 1 ? 'warning' : 'bad')}">${grade.retainedCount}/${grade.totalTalent}</div>
+          <div class="result-metric-label">Key Talent Retained</div>
+          <div class="result-metric-explanation">${retentionExplanation}</div>
+        </div>
+      `;
+
+      // Add dimension breakdown with Kenji's competency framework
+      const dimensionContainer = document.createElement('div');
+      dimensionContainer.className = 'result-dimensions';
+      dimensionContainer.innerHTML = `
+        <h3 style="font-family: var(--font-display); margin-bottom: 0.5rem;">Competency Scorecard</h3>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.5rem;">Your performance across the five M&A leadership competencies</p>
+        <div class="dimension-grid">
+          ${Object.entries(grade.dimensions).map(([key, value]) => {
+            const dg = getDimensionGrade(value);
+            const comp = COMPETENCY_DIMENSIONS[key];
+            return `
+              <div class="dimension-item">
+                <div class="dimension-label">
+                  <strong>${comp.name}</strong>
+                  <span style="display: block; font-size: 0.7rem; color: var(--text-muted); margin-top: 0.2rem;">${comp.description}</span>
+                </div>
+                <div class="dimension-bar">
+                  <div class="dimension-bar-fill ${dg.class}" style="width: ${value}%"></div>
+                </div>
+                <div class="dimension-grade ${dg.class}">${dg.grade}</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+        ${grade.strengths.length > 0 || grade.weaknesses.length > 0 ? `
+          <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-subtle);">
+            ${grade.strengths.length > 0 ? `
+              <div style="margin-bottom: 1rem;">
+                <span style="color: var(--accent-emerald); font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em;">Strengths:</span>
+                <span style="font-size: 0.85rem; margin-left: 0.5rem;">${grade.strengths.map(s => s.name).join(', ')}</span>
+              </div>
+            ` : ''}
+            ${grade.weaknesses.length > 0 ? `
+              <div>
+                <span style="color: var(--accent-red); font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em;">Needs Work:</span>
+                <span style="font-size: 0.85rem; margin-left: 0.5rem;">${grade.weaknesses.map(w => w.name).join(', ')}</span>
+              </div>
+            ` : ''}
+          </div>
+        ` : ''}
+      `;
+      
+      document.getElementById('result-outcome').insertAdjacentElement('beforebegin', dimensionContainer);
+
+      // Add scenario info with archetype
+      const scenarioInfo = document.createElement('div');
+      scenarioInfo.className = 'result-scenario';
+      scenarioInfo.innerHTML = `
+        <div class="scenario-tag">Your Scenario</div>
+        <div style="margin-bottom: 1rem;">
+          <div style="font-family: var(--font-display); font-size: 1.25rem; margin-bottom: 0.25rem;">${archetype.name}</div>
+          <div style="font-style: italic; color: var(--accent-amber); font-size: 0.9rem;">"${archetype.tagline}"</div>
+        </div>
+        <div class="scenario-details">
+          <span><strong>Culture Gap:</strong> ${scenario.culturalGap}</span>
+          <span><strong>Target Size:</strong> ${scenario.targetSize}</span>
+          <span><strong>Industry:</strong> ${scenario.industryContext}</span>
+          <span><strong>Role:</strong> ${GameState.role}</span>
+        </div>
+      `;
+      document.querySelector('.result-container').insertBefore(scenarioInfo, document.getElementById('result-metrics'));
+    }
+
+    function startGame(role) {
+      GameState.role = role;
+      
+      // Randomize scenario
+      randomizeScenario();
+      
+      // Adjust starting metrics based on role
+      if (role === 'target') {
+        GameState.metrics.trustTarget += 15;
+        GameState.metrics.trustAcquirer -= 20;
+        GameState.metrics.boardPressure += 15;
+        GameState.scores.stakeholderManagement -= 10;
+      } else if (role === 'outsider') {
+        GameState.metrics.trustTarget -= 5;
+        GameState.metrics.trustAcquirer -= 15;
+        GameState.metrics.boardPressure += 10;
+      }
+      
+      // Update first scene narrative with actual company names
+      updateSceneNarratives();
+      
+      // Hide intro, show game
+      document.getElementById('intro-screen').style.display = 'none';
+      document.getElementById('game-screen').style.display = 'block';
+      
+      // Show archetype briefing
+      const scenarioDesc = getScenarioDescription();
+      const archetype = ARCHETYPES[GameState.scenario.archetype];
+      
+      addIntelItem('archetype', `<strong>${archetype.name.toUpperCase()}</strong><br>"${archetype.tagline}"`, GameState.day);
+      addIntelItem('briefing', `<strong>WIN CONDITION:</strong> ${archetype.winCondition}`, GameState.day);
+      addIntelItem('warning', `<strong>FAILURE MODE:</strong> ${archetype.failureMode}`, GameState.day);
+      addIntelItem('briefing', `<strong>CULTURE:</strong> ${scenarioDesc.culturalGap}`, GameState.day);
+      addIntelItem('briefing', `<strong>CONTEXT:</strong> ${scenarioDesc.industryContext}`, GameState.day);
+      
+      // Initialize displays
+      updateAllMetrics();
+      updateFlightRiskDisplay();
+      updatePhaseDisplay();
+      
+      // Update logo with company names
+      document.querySelector('.game-logo').innerHTML = `${GameState.scenario.acquirerName} + <span>${GameState.scenario.targetName}</span>`;
+      
+      // Render first scene
+      renderScene(SCENES[0]);
+    }
+
+    // Check and trigger crisis events between scenes
+    function checkCrisisEvents() {
+      const currentPhase = GameState.currentPhase;
+      const currentDay = GameState.day;
+      
+      // Find untriggered crisis events that match current conditions
+      const eligibleCrises = GameState.scenario.crisisEvents.filter(crisis => {
+        // Not already triggered
+        if (GameState.scenario.triggeredCrises.includes(crisis.id)) return false;
+        
+        // Phase match
+        if (crisis.phase !== currentPhase) return false;
+        
+        // Condition check
+        if (!crisis.triggerCondition(GameState)) return false;
+        
+        // Random chance (60% to fire if conditions met)
+        return Math.random() > 0.4;
+      });
+
+      if (eligibleCrises.length > 0) {
+        // Trigger the first eligible crisis
+        const crisis = eligibleCrises[0];
+        GameState.scenario.triggeredCrises.push(crisis.id);
+        
+        // Apply initial effects
+        if (crisis.effects) {
+          Object.entries(crisis.effects).forEach(([key, value]) => {
+            if (GameState.metrics[key] !== undefined) {
+              GameState.metrics[key] += value;
+              GameState.metrics[key] = Math.max(0, Math.min(100, GameState.metrics[key]));
+            }
+          });
+        }
+        
+        return crisis;
+      }
+      
+      return null;
+    }
+
+    function updateSceneNarratives() {
+      // Update all scene narratives with actual company names
+      SCENES.forEach(scene => {
+        if (scene.narrative) {
+          scene.narrative = scene.narrative
+            .replace(/Nexus Corp/g, GameState.scenario.acquirerName)
+            .replace(/Meridian Technologies/g, GameState.scenario.targetName)
+            .replace(/Meridian/g, GameState.scenario.targetName)
+            .replace(/Nexus/g, GameState.scenario.acquirerName);
+        }
+        if (scene.event && scene.event.text) {
+          scene.event.text = scene.event.text
+            .replace(/\{targetName\}/g, GameState.scenario.targetName)
+            .replace(/\{acquirerName\}/g, GameState.scenario.acquirerName)
+            .replace(/Meridian/g, GameState.scenario.targetName)
+            .replace(/Nexus/g, GameState.scenario.acquirerName);
+        }
+        if (scene.cards) {
+          scene.cards.forEach(card => {
+            if (card.description) {
+              card.description = card.description
+                .replace(/Meridian/g, GameState.scenario.targetName)
+                .replace(/Nexus/g, GameState.scenario.acquirerName);
+            }
+          });
+        }
+      });
+    }
+
+    function resetGame() {
+      // Reset state
+      GameState.currentPhase = 0;
+      GameState.currentSceneIndex = 0;
+      GameState.day = -7;
+      GameState.metrics = {
+        trustAcquirer: 65,
+        trustTarget: 35,
+        mergerSyndrome: 42,
+        culturalFriction: 55,
+        rumors: 30,
+        boardPressure: 25,
+        synergy: 15,
+        retention: 100
+      };
+      GameState.scores = {
+        communicationTiming: 50,
+        retentionStrategy: 50,
+        culturalSensitivity: 50,
+        decisionSpeed: 50,
+        stakeholderManagement: 50,
+        adaptability: 50
+      };
+      GameState.scenario = {
+        dealType: null,
+        archetype: null,
+        culturalGap: null,
+        targetSize: null,
+        industryContext: null,
+        acquirerName: 'Nexus Corp',
+        targetName: 'Meridian Technologies',
+        crisisEvents: [],
+        triggeredCrises: []
+      };
+      GameState.keyTalent = [];
+      GameState.intelLog = [];
+      GameState.decisions = [];
+      GameState.eventsTriggered = [];
+      GameState.mistakes = [];
+      GameState.activeCrisisScene = null;
+      
+      // Reset intel feed
+      document.getElementById('intel-feed').innerHTML = '';
+      
+      // Remove dimension breakdown if it exists
+      const dimContainer = document.querySelector('.result-dimensions');
+      if (dimContainer) dimContainer.remove();
+      
+      const scenarioInfo = document.querySelector('.result-scenario');
+      if (scenarioInfo) scenarioInfo.remove();
+      
+      // Reset logo
+      document.querySelector('.game-logo').innerHTML = 'The <span>Integration</span>';
+      
+      // Show intro
+      document.getElementById('result-screen').style.display = 'none';
+      document.getElementById('game-screen').style.display = 'none';
+      document.getElementById('intro-screen').style.display = 'flex';
+    }
+
+    // ==================== EVENT LISTENERS ====================
+    document.querySelectorAll('.role-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const role = card.dataset.role;
+        startGame(role);
+      });
+    });
+
+    document.getElementById('play-card-btn').addEventListener('click', playSelectedCard);
+    document.getElementById('play-again-btn').addEventListener('click', resetGame);
+    document.getElementById('download-checklist-btn').addEventListener('click', downloadChecklist);
+
+  </script>
+</body>
+</html>
